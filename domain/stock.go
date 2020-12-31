@@ -11,8 +11,8 @@ const (
 )
 
 type Stock struct {
-	Ticker string
-	Price  uint
+	Ticker string `json:"ticker"`
+	Price  uint   `json:"price"`
 }
 
 type StockEntity struct {
