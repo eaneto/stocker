@@ -24,10 +24,15 @@ func NewStockController() BaseStockController {
 
 func (controller StockController) RegisterStock(stock domain.Stock) (httpStatus int) {
 	err := controller.StockUseCase.RegisterStock(stock)
-	if err != nil {
+	if err == nil {
+		return http.StatusCreated
+	}
+	_, isConflicError := err.(usecase.AlreadyRegisteredStockError)
+	if isConflicError {
+		return http.StatusConflict
+	} else {
 		return http.StatusInternalServerError
 	}
-	return http.StatusCreated
 }
 
 func (controller StockController) FindByTicker(ticker string) (domain.Stock, int) {

@@ -7,6 +7,10 @@ import (
 	"github.com/eaneto/stocker/domain"
 )
 
+var id uint = 0
+var mu sync.Mutex = sync.Mutex{}
+var stocksByTicker map[string]domain.StockEntity = make(map[string]domain.StockEntity)
+
 type StockNotFoundError struct {
 	Ticker string
 }
@@ -15,36 +19,29 @@ func (err StockNotFoundError) Error() string {
 	return fmt.Sprintf("Stock not found, ticker=%s", err.Ticker)
 }
 
-var id uint = 0
-
 type BaseStockRepository interface {
 	Save(stock domain.StockEntity) error
 	FindByTicker(ticker string) (domain.StockEntity, error)
 	FindAll() []domain.StockEntity
 }
 
-type StockRepository struct {
-	mu     sync.Mutex
-	Stocks map[string]domain.StockEntity
-}
+type StockRepository struct{}
 
 func NewStockRepository() BaseStockRepository {
-	return StockRepository{
-		Stocks: make(map[string]domain.StockEntity),
-	}
+	return StockRepository{}
 }
 
 func (repo StockRepository) Save(stock domain.StockEntity) error {
-	repo.mu.Lock()
+	mu.Lock()
 	id = id + 1
 	stock.ID = id
-	repo.mu.Unlock()
-	repo.Stocks[stock.Ticker] = stock
+	mu.Unlock()
+	stocksByTicker[stock.Ticker] = stock
 	return nil
 }
 
 func (repo StockRepository) FindByTicker(ticker string) (domain.StockEntity, error) {
-	stock, ok := repo.Stocks[ticker]
+	stock, ok := stocksByTicker[ticker]
 	if ok {
 		return stock, nil
 	}
@@ -52,9 +49,15 @@ func (repo StockRepository) FindByTicker(ticker string) (domain.StockEntity, err
 }
 
 func (repo StockRepository) FindAll() []domain.StockEntity {
-	stocks := make([]domain.StockEntity, len(repo.Stocks))
-	for _, stock := range repo.Stocks {
+	stocks := make([]domain.StockEntity, len(stocksByTicker))
+	for _, stock := range stocksByTicker {
 		stocks = append(stocks, stock)
 	}
 	return stocks
+}
+
+// clearAll Clears all stored data, meant to used only on tests.
+func clearAll() {
+	id = 0
+	stocksByTicker = make(map[string]domain.StockEntity)
 }

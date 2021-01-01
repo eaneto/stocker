@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"sync"
 	"testing"
 
 	"github.com/eaneto/stocker/domain"
@@ -9,10 +8,9 @@ import (
 )
 
 func TestSaveStock(t *testing.T) {
-	repository := StockRepository{
-		mu:     sync.Mutex{},
-		Stocks: make(map[string]domain.StockEntity),
-	}
+	clearAll()
+
+	repository := StockRepository{}
 
 	stock := domain.StockEntity{
 		Ticker: "ABC",
@@ -21,22 +19,23 @@ func TestSaveStock(t *testing.T) {
 	err := repository.Save(stock)
 
 	assert.Nil(t, err)
-	assert.Equal(t, 1, len(repository.Stocks))
-	assert.Equal(t, stock.Ticker, repository.Stocks[stock.Ticker].Ticker)
-	assert.Equal(t, uint(1), repository.Stocks[stock.Ticker].ID)
+	assert.Equal(t, 1, len(stocksByTicker))
+	assert.Equal(t, stock.Ticker, stocksByTicker[stock.Ticker].Ticker)
+	assert.Equal(t, uint(1), stocksByTicker[stock.Ticker].ID)
 }
 
 func TestFindStockByTicker(t *testing.T) {
+	clearAll()
+
 	stocks := make(map[string]domain.StockEntity)
 	stock := domain.StockEntity{
 		ID:     1,
 		Ticker: "ABC",
 	}
 	stocks[stock.Ticker] = stock
-	repository := StockRepository{
-		mu:     sync.Mutex{},
-		Stocks: stocks,
-	}
+	stocksByTicker = stocks
+
+	repository := StockRepository{}
 
 	foundStock, err := repository.FindByTicker(stock.Ticker)
 
@@ -46,15 +45,13 @@ func TestFindStockByTicker(t *testing.T) {
 }
 
 func TestFindStockByTickerNonExistentStock(t *testing.T) {
-	stocks := make(map[string]domain.StockEntity)
+	clearAll()
+
 	stock := domain.StockEntity{
 		ID:     1,
 		Ticker: "ABC",
 	}
-	repository := StockRepository{
-		mu:     sync.Mutex{},
-		Stocks: stocks,
-	}
+	repository := StockRepository{}
 
 	_, err := repository.FindByTicker(stock.Ticker)
 
