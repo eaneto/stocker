@@ -1,5 +1,7 @@
 # stocker
 
+[![codecov](https://codecov.io/gh/eaneto/stocker/branch/main/graph/badge.svg)](https://codecov.io/gh/eaneto/stocker)
+
 ## Endpoints
 
 ### Stocks resource
