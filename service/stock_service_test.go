@@ -23,6 +23,11 @@ func (m *StockRepositoryMock) FindByTicker(ticker string) (domain.StockEntity, e
 	return args.Get(0).(domain.StockEntity), args.Error(1)
 }
 
+func (m *StockRepositoryMock) FindByID(id uint) (domain.StockEntity, error) {
+	args := m.Called(id)
+	return args.Get(0).(domain.StockEntity), args.Error(1)
+}
+
 func (m *StockRepositoryMock) FindAll() []domain.StockEntity {
 	args := m.Called()
 	return args.Get(0).([]domain.StockEntity)

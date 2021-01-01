@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/eaneto/stocker/domain"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -15,6 +16,11 @@ type CustomerRepositoryMock struct {
 func (m *CustomerRepositoryMock) Save(stock domain.CustomerEntity) error {
 	args := m.Called(stock)
 	return args.Error(0)
+}
+
+func (m *CustomerRepositoryMock) FindByCode(code uuid.UUID) (domain.CustomerEntity, error) {
+	args := m.Called(code)
+	return args.Get(0).(domain.CustomerEntity), args.Error(1)
 }
 
 func (m *CustomerRepositoryMock) FindAll() []domain.CustomerEntity {
