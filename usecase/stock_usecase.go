@@ -9,6 +9,7 @@ import (
 type BaseStockUseCase interface {
 	RegisterStock(stock domain.Stock) error
 	SearchByTicker(ticker string) (domain.Stock, error)
+	FindAll() []domain.Stock
 }
 
 type StockUseCase struct {
@@ -36,4 +37,8 @@ func (usecase StockUseCase) RegisterStock(stock domain.Stock) error {
 
 func (usecase StockUseCase) SearchByTicker(ticker string) (domain.Stock, error) {
 	return usecase.StockService.SearchByTicker(ticker)
+}
+
+func (usecase StockUseCase) FindAll() []domain.Stock {
+	return usecase.StockService.FindAll()
 }

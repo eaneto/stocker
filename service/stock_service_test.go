@@ -114,3 +114,38 @@ func TestSearchUneegisteredStockByTickerShouldReturnError(t *testing.T) {
 	assert.True(t, isNotFound)
 	repository.AssertExpectations(t)
 }
+
+func TestFindAllReturningEmptyShouldReturnEmptyList(t *testing.T) {
+	repository := new(StockRepositoryMock)
+
+	stocks := []domain.StockEntity{}
+	repository.On("FindAll").Return(stocks)
+
+	service := StockService{
+		StockRepository: repository,
+	}
+
+	foundStocks := service.FindAll()
+
+	assert.Empty(t, foundStocks)
+}
+
+func TestFindAllReturningOneItemShouldReturnListWithOneItem(t *testing.T) {
+	repository := new(StockRepositoryMock)
+
+	stocks := []domain.StockEntity{
+		{
+			Ticker: "ABV9",
+		},
+	}
+	repository.On("FindAll").Return(stocks)
+
+	service := StockService{
+		StockRepository: repository,
+	}
+
+	foundStocks := service.FindAll()
+
+	assert.Equal(t, len(stocks), len(foundStocks))
+	assert.Equal(t, stocks[0].Ticker, foundStocks[0].Ticker)
+}

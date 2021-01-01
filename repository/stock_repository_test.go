@@ -57,3 +57,38 @@ func TestFindStockByTickerNonExistentStock(t *testing.T) {
 
 	assert.NotNil(t, err)
 }
+
+func TestFindAllStocksWithNoneRegisteredShouldReturnEmptySlice(t *testing.T) {
+	clearAll()
+
+	repository := StockRepository{}
+
+	stocks := repository.FindAll()
+
+	assert.Empty(t, stocks)
+}
+
+func TestFindAllStocksWithOneRegisteredShouldReturnSliceWithOneElement(t *testing.T) {
+	clearAll()
+
+	stocks := make(map[string]domain.StockEntity)
+	stock := domain.StockEntity{
+		ID:     1,
+		Ticker: "ABC",
+	}
+	stocks[stock.Ticker] = stock
+	stocksByTicker = stocks
+
+	repository := StockRepository{}
+
+	foundStocks := repository.FindAll()
+
+	assert.Equal(t, len(stocks), len(foundStocks))
+	assert.Equal(t, stock, foundStocks[0])
+}
+
+// clearAll Clears all stored data, meant to used only on tests.
+func clearAll() {
+	id = 0
+	stocksByTicker = make(map[string]domain.StockEntity)
+}

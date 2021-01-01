@@ -24,6 +24,11 @@ func (m *StockUseCaseMock) SearchByTicker(ticker string) (domain.Stock, error) {
 	return args.Get(0).(domain.Stock), args.Error(1)
 }
 
+func (m *StockUseCaseMock) FindAll() []domain.Stock {
+	args := m.Called()
+	return args.Get(0).([]domain.Stock)
+}
+
 func TestRegisterUnregisteredStockShouldReturnCreated(t *testing.T) {
 	stockUsecase := new(StockUseCaseMock)
 
@@ -141,4 +146,19 @@ func TestSearchStockWithUnexpectedErrorShouldReturnInternalServerError(t *testin
 	_, status := controller.FindByTicker(stock.Ticker)
 
 	assert.Equal(t, status, http.StatusInternalServerError)
+}
+
+func TestFindAllShouldJustReturnAndOk(t *testing.T) {
+	usecaseMock := new(StockUseCaseMock)
+
+	usecaseMock.On("FindAll").Return([]domain.Stock{})
+
+	controller := StockController{
+		StockUseCase: usecaseMock,
+	}
+
+	foundStocks, status := controller.FindAll()
+
+	assert.Empty(t, foundStocks)
+	assert.Equal(t, http.StatusOK, status)
 }

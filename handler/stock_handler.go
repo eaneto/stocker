@@ -37,26 +37,47 @@ func (handler StockHandler) handleGet(w http.ResponseWriter, r *http.Request) {
 	ticker := strings.TrimPrefix(r.URL.Path, "/stocks")
 	if ticker == "" || ticker == "/" {
 		logrus.Info("GET all stocks")
+		handler.getAllStocks(w, r)
 	} else {
 		ticker = strings.ReplaceAll(ticker, "/", "")
-		logrus.WithField("ticker", ticker).Info("GET specific stock")
-		stock, status := handler.StockController.FindByTicker(ticker)
-		if status == http.StatusNotFound {
-			w.WriteHeader(status)
+		handler.getSpecificStock(ticker, w, r)
+	}
+}
+
+func (handler StockHandler) getAllStocks(w http.ResponseWriter, r *http.Request) {
+	stocks, status := handler.StockController.FindAll()
+	payload, err := json.Marshal(stocks)
+	if err != nil {
+		logrus.WithFields(logrus.Fields{
+			"error": err,
+		}).Error("Marshaling stocks to JSON.")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(payload)
+	w.WriteHeader(status)
+}
+
+func (handler StockHandler) getSpecificStock(ticker string, w http.ResponseWriter, r *http.Request) {
+	logrus.WithField("ticker", ticker).Info("GET specific stock")
+	stock, status := handler.StockController.FindByTicker(ticker)
+	if status != http.StatusOK {
+		w.WriteHeader(status)
+		return
+	} else {
+		payload, err := json.Marshal(stock)
+		if err != nil {
+			logrus.WithFields(logrus.Fields{
+				"error": err,
+			}).Error("Marshaling stock.")
+			w.WriteHeader(http.StatusInternalServerError)
 			return
-		} else {
-			payload, err := json.Marshal(stock)
-			if err != nil {
-				logrus.WithFields(logrus.Fields{
-					"error": err,
-				}).Error("Marshaling stock.")
-				w.WriteHeader(http.StatusInternalServerError)
-			}
-			logrus.WithField("payload", string(payload)).
-				Info("Found stock.")
-			w.Header().Set("Content-Type", "application/json")
-			w.Write(payload)
 		}
+		logrus.WithField("payload", string(payload)).
+			Info("Found stock.")
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(payload)
 	}
 }
 

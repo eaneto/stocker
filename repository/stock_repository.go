@@ -7,7 +7,8 @@ import (
 )
 
 var id uint = 0
-var mu sync.Mutex = sync.Mutex{}
+var idMutex sync.Mutex = sync.Mutex{}
+var stocksMutex sync.Mutex = sync.Mutex{}
 var stocksByTicker map[string]domain.StockEntity = make(map[string]domain.StockEntity)
 
 type BaseStockRepository interface {
@@ -23,11 +24,14 @@ func NewStockRepository() BaseStockRepository {
 }
 
 func (repo StockRepository) Save(stock domain.StockEntity) error {
-	mu.Lock()
+	idMutex.Lock()
 	id = id + 1
+	idMutex.Unlock()
+
+	stocksMutex.Lock()
 	stock.ID = id
-	mu.Unlock()
 	stocksByTicker[stock.Ticker] = stock
+	stocksMutex.Unlock()
 	return nil
 }
 
@@ -41,14 +45,10 @@ func (repo StockRepository) FindByTicker(ticker string) (domain.StockEntity, err
 
 func (repo StockRepository) FindAll() []domain.StockEntity {
 	stocks := make([]domain.StockEntity, len(stocksByTicker))
+	i := 0
 	for _, stock := range stocksByTicker {
-		stocks = append(stocks, stock)
+		stocks[i] = stock
+		i = i + 1
 	}
 	return stocks
-}
-
-// clearAll Clears all stored data, meant to used only on tests.
-func clearAll() {
-	id = 0
-	stocksByTicker = make(map[string]domain.StockEntity)
 }

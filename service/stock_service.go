@@ -10,6 +10,7 @@ import (
 type BaseStockService interface {
 	RegisterStock(stock domain.Stock) error
 	SearchByTicker(ticker string) (domain.Stock, error)
+	FindAll() []domain.Stock
 }
 
 type StockService struct {
@@ -37,4 +38,16 @@ func (service StockService) SearchByTicker(ticker string) (domain.Stock, error) 
 		Ticker: stockEntity.Ticker,
 		Price:  stockEntity.Price,
 	}, err
+}
+
+func (service StockService) FindAll() []domain.Stock {
+	stocksEntities := service.StockRepository.FindAll()
+	stocks := make([]domain.Stock, len(stocksEntities))
+	for i, entity := range stocksEntities {
+		stocks[i] = domain.Stock{
+			Ticker: entity.Ticker,
+			Price:  entity.Price,
+		}
+	}
+	return stocks
 }

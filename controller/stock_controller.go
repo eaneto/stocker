@@ -10,6 +10,7 @@ import (
 type BaseStockController interface {
 	RegisterStock(stock domain.Stock) (httpStatus int)
 	FindByTicker(ticker string) (stock domain.Stock, httpStatus int)
+	FindAll() (stocks []domain.Stock, httpStatus int)
 }
 
 type StockController struct {
@@ -45,4 +46,8 @@ func (controller StockController) FindByTicker(ticker string) (domain.Stock, int
 		return domain.Stock{}, http.StatusNotFound
 	}
 	return domain.Stock{}, http.StatusInternalServerError
+}
+
+func (controller StockController) FindAll() ([]domain.Stock, int) {
+	return controller.StockUseCase.FindAll(), http.StatusOK
 }

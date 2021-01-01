@@ -22,6 +22,11 @@ func (m *StockServiceMock) SearchByTicker(ticker string) (domain.Stock, error) {
 	return args.Get(0).(domain.Stock), args.Error(1)
 }
 
+func (m *StockServiceMock) FindAll() []domain.Stock {
+	args := m.Called()
+	return args.Get(0).([]domain.Stock)
+}
+
 func TestRegisterStockWithUnregisteredTickerShouldNotReturnError(t *testing.T) {
 	service := new(StockServiceMock)
 
@@ -111,4 +116,18 @@ func TestSearchUnregisteredStockByTickerShouldReturnNotFoundError(t *testing.T) 
 	service.AssertExpectations(t)
 	assert.Empty(t, foundStock.Ticker)
 	assert.Equal(t, uint(0), foundStock.Price)
+}
+
+func TestFindAllShouldJustReturn(t *testing.T) {
+	service := new(StockServiceMock)
+
+	service.On("FindAll").Return([]domain.Stock{})
+
+	stockUsecase := StockUseCase{
+		StockService: service,
+	}
+
+	foundStocks := stockUsecase.FindAll()
+
+	assert.Empty(t, foundStocks)
 }
