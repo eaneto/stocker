@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"math/big"
 	"time"
 )
 
@@ -16,7 +15,7 @@ type Stock struct {
 }
 
 type StockEntity struct {
-	ID        big.Int
+	ID        uint
 	Ticker    string
 	Price     uint
 	CreatedAt time.Time
@@ -24,7 +23,7 @@ type StockEntity struct {
 }
 
 type StockHistoryEntity struct {
-	ID        big.Int
+	ID        uint
 	StockID   uint
 	Price     uint
 	CreatedAt time.Time
