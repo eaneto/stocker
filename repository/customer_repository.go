@@ -14,6 +14,7 @@ var customersByCode map[uuid.UUID]domain.CustomerEntity = make(map[uuid.UUID]dom
 
 type BaseCustomerRepository interface {
 	Save(customer domain.CustomerEntity) error
+	FindByCode(code uuid.UUID) (domain.CustomerEntity, error)
 	FindAll() []domain.CustomerEntity
 }
 
@@ -33,6 +34,14 @@ func (CustomerRepository) Save(customer domain.CustomerEntity) error {
 	customersByCode[customer.Code] = customer
 	customersMutex.Unlock()
 	return nil
+}
+
+func (CustomerRepository) FindByCode(code uuid.UUID) (domain.CustomerEntity, error) {
+	customer, ok := customersByCode[code]
+	if ok {
+		return customer, nil
+	}
+	return domain.CustomerEntity{}, domain.CustomerNotFoundError{Code: code}
 }
 
 func (CustomerRepository) FindAll() []domain.CustomerEntity {

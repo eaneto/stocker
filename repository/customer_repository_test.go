@@ -61,6 +61,39 @@ func TestFindAllCustomersWithOneRegisteredShouldReturnSliceWithOneElement(t *tes
 	assert.Equal(t, customer, foundCustomers[0])
 }
 
+func TestFindCustomerByCodeOfExistentCustomerShouldReturnCustomer(t *testing.T) {
+	clearAllCustomers()
+
+	customers := make(map[uuid.UUID]domain.CustomerEntity)
+	code, _ := uuid.NewRandom()
+	customer := domain.CustomerEntity{
+		Name: "Françoise",
+		Code: code,
+	}
+	customers[code] = customer
+	customersByCode = customers
+
+	repository := CustomerRepository{}
+
+	foundCustomer, err := repository.FindByCode(code)
+
+	assert.Nil(t, err)
+	assert.Equal(t, customer, foundCustomer)
+}
+
+func TestFindCustomerByCodeOfNonExistentCustomerShouldReturnError(t *testing.T) {
+	clearAllCustomers()
+
+	code, _ := uuid.NewRandom()
+	repository := CustomerRepository{}
+
+	_, err := repository.FindByCode(code)
+
+	assert.NotNil(t, err)
+	_, isNotFound := err.(domain.CustomerNotFoundError)
+	assert.True(t, isNotFound)
+}
+
 // clearAllCustomers Clears all stores customers and resets ids.
 func clearAllCustomers() {
 	customerId = 0

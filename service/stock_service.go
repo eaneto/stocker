@@ -11,6 +11,7 @@ type BaseStockService interface {
 	RegisterStock(stock domain.Stock) error
 	SearchByTicker(ticker string) (domain.Stock, error)
 	FindAll() []domain.Stock
+	FindByID(id uint) (domain.StockEntity, error)
 }
 
 type StockService struct {
@@ -38,6 +39,10 @@ func (service StockService) SearchByTicker(ticker string) (domain.Stock, error) 
 		Ticker: stockEntity.Ticker,
 		Price:  stockEntity.Price,
 	}, err
+}
+
+func (service StockService) FindByID(id uint) (domain.StockEntity, error) {
+	return service.StockRepository.FindByID(id)
 }
 
 func (service StockService) FindAll() []domain.Stock {

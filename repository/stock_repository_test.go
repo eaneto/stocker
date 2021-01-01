@@ -20,6 +20,7 @@ func TestSaveStockShouldSaveStockOnMap(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(stocksByTicker))
+	assert.Equal(t, 1, len(stocksByID))
 	assert.Equal(t, stock.Ticker, stocksByTicker[stock.Ticker].Ticker)
 	assert.Equal(t, uint(1), stocksByTicker[stock.Ticker].ID)
 }
@@ -56,6 +57,44 @@ func TestFindStockByTickerNonExistentStock(t *testing.T) {
 	_, err := repository.FindByTicker(stock.Ticker)
 
 	assert.NotNil(t, err)
+	_, notFound := err.(domain.StockNotFoundError)
+	assert.True(t, notFound)
+}
+
+func TestFindStockByID(t *testing.T) {
+	clearAllStocks()
+
+	stocks := make(map[string]domain.StockEntity)
+	stock := domain.StockEntity{
+		ID:     1,
+		Ticker: "ABC",
+	}
+	stocks[stock.Ticker] = stock
+	stocksByTicker = stocks
+
+	repository := StockRepository{}
+
+	foundStock, err := repository.FindByID(stock.ID)
+
+	assert.Nil(t, err)
+	assert.Equal(t, stock.Ticker, foundStock.Ticker)
+	assert.Equal(t, stock.ID, foundStock.ID)
+}
+
+func TestFindStockByIDNonExistentStockShouldReturnError(t *testing.T) {
+	clearAllStocks()
+
+	stock := domain.StockEntity{
+		ID:     1,
+		Ticker: "ABC",
+	}
+	repository := StockRepository{}
+
+	_, err := repository.FindByTicker(stock.Ticker)
+
+	assert.NotNil(t, err)
+	_, notFound := err.(domain.StockNotFoundError)
+	assert.True(t, notFound)
 }
 
 func TestFindAllStocksWithNoneRegisteredShouldReturnEmptySlice(t *testing.T) {

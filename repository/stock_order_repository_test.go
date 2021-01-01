@@ -93,6 +93,17 @@ func assertStockOrderEqual(t *testing.T, orderA, orderB domain.StockOrderEntity)
 	assert.Equal(t, orderA.UpdatedAt, orderB.UpdatedAt)
 }
 
+func TestFindAllStockOrdersByCustomer(t *testing.T) {
+	clearAllStockOrders()
+
+	repository := StockOrderRepository{}
+	customerID := uint(1)
+
+	orders := repository.FindAllByCustomer(customerID)
+
+	assert.Empty(t, orders)
+}
+
 // clearAllStockOrders Clears all stored orders and resets id.
 func clearAllStockOrders() {
 	stockOrderId = 0

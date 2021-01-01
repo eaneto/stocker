@@ -1,9 +1,15 @@
 package service
 
-import "github.com/eaneto/stocker/repository"
+import (
+	"github.com/eaneto/stocker/domain"
+	"github.com/eaneto/stocker/repository"
+)
 
-type StockOrderService interface{}
+type BaseStockOrderService interface {
+	CreateOrder(stockOrderRequest domain.StockOrderRequest) error
+	FindAllByCustomer(customerID uint) []domain.StockOrderEntity
+}
 
-type stockOrderService struct {
+type StockOrderService struct {
 	StockOrderRepository repository.StockOrderRepository
 }

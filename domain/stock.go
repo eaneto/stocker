@@ -20,10 +20,11 @@ func (e AlreadyRegisteredStockError) Error() string {
 
 type StockNotFoundError struct {
 	Ticker string
+	ID     uint
 }
 
 func (err StockNotFoundError) Error() string {
-	return fmt.Sprintf("Stock not found, ticker=%s", err.Ticker)
+	return fmt.Sprintf("Stock not found, ticker=%s, id=%d", err.Ticker, err.ID)
 }
 
 type Stock struct {

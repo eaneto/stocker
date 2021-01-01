@@ -19,6 +19,7 @@ var ordersByCustomer map[uint][]domain.StockOrderEntity = make(map[uint][]domain
 
 type BaseStockOrderRepository interface {
 	Save(stockOrder domain.StockOrderEntity) error
+	FindAllByCustomer(customerID uint) []domain.StockOrderEntity
 }
 
 type StockOrderRepository struct{}
@@ -35,4 +36,8 @@ func (StockOrderRepository) Save(stockOrder domain.StockOrderEntity) error {
 	ordersByCustomer[stockOrder.CustomerID] = append(ordersByCustomer[stockOrder.CustomerID], stockOrder)
 	stockOrderMutex.Unlock()
 	return nil
+}
+
+func (StockOrderRepository) FindAllByCustomer(customerID uint) []domain.StockOrderEntity {
+	return ordersByCustomer[customerID]
 }

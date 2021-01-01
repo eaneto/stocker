@@ -10,6 +10,7 @@ import (
 
 type BaseCustomerService interface {
 	Create(name string)
+	FindByCode(code uuid.UUID) (domain.CustomerEntity, error)
 	FindAll() []domain.Customer
 }
 
@@ -31,6 +32,10 @@ func (service CustomerService) Create(name string) {
 		CreatedAt: time.Now(),
 	}
 	service.CustomerRepository.Save(customer)
+}
+
+func (service CustomerService) FindByCode(code uuid.UUID) (domain.CustomerEntity, error) {
+	return service.CustomerRepository.FindByCode(code)
 }
 
 func (service CustomerService) FindAll() []domain.Customer {
