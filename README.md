@@ -2,6 +2,8 @@
 
 [![codecov](https://codecov.io/gh/eaneto/stocker/branch/main/graph/badge.svg)](https://codecov.io/gh/eaneto/stocker)
 
+Bare bones.
+
 ## Endpoints
 
 ### Stocks resource
@@ -69,14 +71,3 @@ POST /order
   "amount": 10
 }
 ```
-
-Stock API -> Writes on PostgreSQL and publishes to RabbitMQ.
-    - Register Stocks
-      - Writes to database
-    - Get stocks
-      - Get prices from database
-    - Create stock orders
-      - Publishes to RabbitMQ
-
-Stock Order Worker ->
-    Consumes from RabbitMQ and writes on PostgreSQL.
