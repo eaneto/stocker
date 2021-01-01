@@ -14,6 +14,12 @@ type StockUseCase struct {
 	StockService service.BaseStockService
 }
 
+func NewStockUseCase() BaseStockUseCase {
+	return StockUseCase{
+		StockService: service.NewStockService(),
+	}
+}
+
 func (usecase StockUseCase) RegisterStock(stock domain.Stock) error {
 	usecase.StockService.RegisterStock(stock)
 	return nil

@@ -15,6 +15,12 @@ type StockHandler struct {
 	StockController controller.BaseStockController
 }
 
+func NewStockHandler() Handler {
+	return StockHandler{
+		StockController: controller.NewStockController(),
+	}
+}
+
 func (handler StockHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		handler.handleGet(w, r)

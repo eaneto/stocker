@@ -16,6 +16,12 @@ type StockController struct {
 	StockUseCase usecase.BaseStockUseCase
 }
 
+func NewStockController() BaseStockController {
+	return StockController{
+		StockUseCase: usecase.NewStockUseCase(),
+	}
+}
+
 func (controller StockController) RegisterStock(stock domain.Stock) (httpStatus int) {
 	err := controller.StockUseCase.RegisterStock(stock)
 	if err != nil {

@@ -28,6 +28,12 @@ type StockRepository struct {
 	Stocks map[string]domain.StockEntity
 }
 
+func NewStockRepository() BaseStockRepository {
+	return StockRepository{
+		Stocks: make(map[string]domain.StockEntity),
+	}
+}
+
 func (repo StockRepository) Save(stock domain.StockEntity) error {
 	repo.mu.Lock()
 	id = id + 1

@@ -16,6 +16,12 @@ type StockService struct {
 	StockRepository repository.BaseStockRepository
 }
 
+func NewStockService() BaseStockService {
+	return StockService{
+		StockRepository: repository.NewStockRepository(),
+	}
+}
+
 func (service StockService) RegisterStock(stock domain.Stock) error {
 	stockEntity := domain.StockEntity{
 		Ticker:    stock.Ticker,
