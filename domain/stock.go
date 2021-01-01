@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -8,6 +9,22 @@ const (
 	STOCK        = "STOCK"
 	STOCK_HISTOY = "STOCK"
 )
+
+type AlreadyRegisteredStockError struct {
+	Ticker string
+}
+
+func (e AlreadyRegisteredStockError) Error() string {
+	return fmt.Sprintf("Stock already registered with ticker=%s", e.Ticker)
+}
+
+type StockNotFoundError struct {
+	Ticker string
+}
+
+func (err StockNotFoundError) Error() string {
+	return fmt.Sprintf("Stock not found, ticker=%s", err.Ticker)
+}
 
 type Stock struct {
 	Ticker string `json:"ticker"`

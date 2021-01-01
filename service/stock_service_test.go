@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/eaneto/stocker/domain"
-	repo "github.com/eaneto/stocker/repository"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -101,7 +100,7 @@ func TestSearchUneegisteredStockByTickerShouldReturnError(t *testing.T) {
 	ticker := "ABV9"
 	stockEntity := domain.StockEntity{}
 
-	notFoundError := repo.StockNotFoundError{}
+	notFoundError := domain.StockNotFoundError{}
 	repository.On("FindByTicker", ticker).Return(stockEntity, notFoundError)
 
 	service := StockService{
@@ -111,7 +110,7 @@ func TestSearchUneegisteredStockByTickerShouldReturnError(t *testing.T) {
 	_, err := service.SearchByTicker(ticker)
 
 	assert.NotNil(t, err)
-	_, isNotFound := err.(repo.StockNotFoundError)
+	_, isNotFound := err.(domain.StockNotFoundError)
 	assert.True(t, isNotFound)
 	repository.AssertExpectations(t)
 }

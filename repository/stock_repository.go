@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/eaneto/stocker/domain"
@@ -10,14 +9,6 @@ import (
 var id uint = 0
 var mu sync.Mutex = sync.Mutex{}
 var stocksByTicker map[string]domain.StockEntity = make(map[string]domain.StockEntity)
-
-type StockNotFoundError struct {
-	Ticker string
-}
-
-func (err StockNotFoundError) Error() string {
-	return fmt.Sprintf("Stock not found, ticker=%s", err.Ticker)
-}
 
 type BaseStockRepository interface {
 	Save(stock domain.StockEntity) error
@@ -45,7 +36,7 @@ func (repo StockRepository) FindByTicker(ticker string) (domain.StockEntity, err
 	if ok {
 		return stock, nil
 	}
-	return domain.StockEntity{}, StockNotFoundError{Ticker: ticker}
+	return domain.StockEntity{}, domain.StockNotFoundError{Ticker: ticker}
 }
 
 func (repo StockRepository) FindAll() []domain.StockEntity {

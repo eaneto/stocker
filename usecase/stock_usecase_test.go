@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/eaneto/stocker/domain"
-	"github.com/eaneto/stocker/repository"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -31,7 +30,7 @@ func TestRegisterStockWithUnregisteredTickerShouldNotReturnError(t *testing.T) {
 		Price:  12300,
 	}
 
-	notFoundError := repository.StockNotFoundError{}
+	notFoundError := domain.StockNotFoundError{}
 	service.On("SearchByTicker", stock.Ticker).Return(domain.Stock{}, notFoundError)
 	service.On("RegisterStock", stock).Return(nil)
 
@@ -62,7 +61,7 @@ func TestRegisterStockWithAlreadyRegisteredTickerShouldReturnError(t *testing.T)
 	err := usecase.RegisterStock(stock)
 
 	assert.NotNil(t, err)
-	_, isAlreadyRegistered := err.(AlreadyRegisteredStockError)
+	_, isAlreadyRegistered := err.(domain.AlreadyRegisteredStockError)
 	assert.True(t, isAlreadyRegistered)
 	service.AssertExpectations(t)
 	service.AssertNotCalled(t, "RegisterStock", mock.Anything)
@@ -98,7 +97,7 @@ func TestSearchUnregisteredStockByTickerShouldReturnNotFoundError(t *testing.T) 
 		Price:  12300,
 	}
 
-	notFoundError := repository.StockNotFoundError{}
+	notFoundError := domain.StockNotFoundError{}
 	service.On("SearchByTicker", stock.Ticker).Return(domain.Stock{}, notFoundError)
 
 	usecase := StockUseCase{

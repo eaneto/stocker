@@ -6,8 +6,6 @@ import (
 	"testing"
 
 	"github.com/eaneto/stocker/domain"
-	"github.com/eaneto/stocker/repository"
-	"github.com/eaneto/stocker/usecase"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -53,7 +51,7 @@ func TestRegisterAlreadyRegisteredStockShouldReturnConflict(t *testing.T) {
 		Price:  100,
 	}
 
-	error := usecase.AlreadyRegisteredStockError{Ticker: stock.Ticker}
+	error := domain.AlreadyRegisteredStockError{Ticker: stock.Ticker}
 	stockUsecase.On("RegisterStock", stock).Return(error)
 
 	controller := StockController{
@@ -113,7 +111,7 @@ func TestSearchUnregisteredStockShouldReturnNotFound(t *testing.T) {
 		Price:  100,
 	}
 
-	error := repository.StockNotFoundError{Ticker: stock.Ticker}
+	error := domain.StockNotFoundError{Ticker: stock.Ticker}
 	stockUsecase.On("SearchByTicker", stock.Ticker).Return(domain.Stock{}, error)
 
 	controller := StockController{
