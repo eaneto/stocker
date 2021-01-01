@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/eaneto/stocker/domain"
+	"github.com/eaneto/stocker/repository"
 	"github.com/eaneto/stocker/usecase"
 )
 
@@ -37,8 +38,12 @@ func (controller StockController) RegisterStock(stock domain.Stock) (httpStatus 
 
 func (controller StockController) FindByTicker(ticker string) (domain.Stock, int) {
 	stock, err := controller.StockUseCase.SearchByTicker(ticker)
-	if err != nil {
+	if err == nil {
+		return stock, http.StatusOK
+	}
+	_, isNotFound := err.(repository.StockNotFoundError)
+	if isNotFound {
 		return domain.Stock{}, http.StatusNotFound
 	}
-	return stock, http.StatusOK
+	return domain.Stock{}, http.StatusInternalServerError
 }
