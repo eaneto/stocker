@@ -23,7 +23,7 @@ func init() {
 			StockUseCase: usecase.StockUseCase{
 				StockService: service.StockService{
 					StockRepository: repository.StockRepository{
-						Stocks: make([]domain.StockEntity, 10),
+						Stocks: make(map[string]domain.StockEntity),
 					},
 				},
 			},

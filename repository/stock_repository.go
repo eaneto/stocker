@@ -25,7 +25,7 @@ type BaseStockRepository interface {
 
 type StockRepository struct {
 	mu     sync.Mutex
-	Stocks []domain.StockEntity
+	Stocks map[string]domain.StockEntity
 }
 
 func (repo StockRepository) Save(stock domain.StockEntity) error {
@@ -33,19 +33,22 @@ func (repo StockRepository) Save(stock domain.StockEntity) error {
 	id = id + 1
 	stock.ID = id
 	repo.mu.Unlock()
-	repo.Stocks = append(repo.Stocks, stock)
+	repo.Stocks[stock.Ticker] = stock
 	return nil
 }
 
 func (repo StockRepository) FindByTicker(ticker string) (domain.StockEntity, error) {
-	for _, stock := range repo.Stocks {
-		if stock.Ticker == ticker {
-			return stock, nil
-		}
+	stock, ok := repo.Stocks[ticker]
+	if ok {
+		return stock, nil
 	}
 	return domain.StockEntity{}, StockNotFoundError{Ticker: ticker}
 }
 
 func (repo StockRepository) FindAll() []domain.StockEntity {
-	return repo.Stocks
+	stocks := make([]domain.StockEntity, len(repo.Stocks))
+	for _, stock := range repo.Stocks {
+		stocks = append(stocks, stock)
+	}
+	return stocks
 }
