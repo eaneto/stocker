@@ -14,7 +14,7 @@ var stockOrderHandler handler.Handler
 // injection.
 func init() {
 	stockHandler = handler.NewStockHandler()
-	customerHandler = handler.CustomerHandler{}
+	customerHandler = handler.NewCustomerHandler()
 	stockOrderHandler = handler.StockOrderHandler{}
 }
 

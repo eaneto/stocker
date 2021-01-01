@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSaveStock(t *testing.T) {
-	clearAll()
+func TestSaveStockShouldSaveStockOnMap(t *testing.T) {
+	clearAllStocks()
 
 	repository := StockRepository{}
 
@@ -25,7 +25,7 @@ func TestSaveStock(t *testing.T) {
 }
 
 func TestFindStockByTicker(t *testing.T) {
-	clearAll()
+	clearAllStocks()
 
 	stocks := make(map[string]domain.StockEntity)
 	stock := domain.StockEntity{
@@ -45,7 +45,7 @@ func TestFindStockByTicker(t *testing.T) {
 }
 
 func TestFindStockByTickerNonExistentStock(t *testing.T) {
-	clearAll()
+	clearAllStocks()
 
 	stock := domain.StockEntity{
 		ID:     1,
@@ -59,7 +59,7 @@ func TestFindStockByTickerNonExistentStock(t *testing.T) {
 }
 
 func TestFindAllStocksWithNoneRegisteredShouldReturnEmptySlice(t *testing.T) {
-	clearAll()
+	clearAllStocks()
 
 	repository := StockRepository{}
 
@@ -69,7 +69,7 @@ func TestFindAllStocksWithNoneRegisteredShouldReturnEmptySlice(t *testing.T) {
 }
 
 func TestFindAllStocksWithOneRegisteredShouldReturnSliceWithOneElement(t *testing.T) {
-	clearAll()
+	clearAllStocks()
 
 	stocks := make(map[string]domain.StockEntity)
 	stock := domain.StockEntity{
@@ -87,8 +87,8 @@ func TestFindAllStocksWithOneRegisteredShouldReturnSliceWithOneElement(t *testin
 	assert.Equal(t, stock, foundStocks[0])
 }
 
-// clearAll Clears all stored data, meant to used only on tests.
-func clearAll() {
-	id = 0
+// clearAllStocks Clears all stored stocks and resets id.
+func clearAllStocks() {
+	stockId = 0
 	stocksByTicker = make(map[string]domain.StockEntity)
 }

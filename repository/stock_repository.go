@@ -6,8 +6,8 @@ import (
 	"github.com/eaneto/stocker/domain"
 )
 
-var id uint = 0
-var idMutex sync.Mutex = sync.Mutex{}
+var stockId uint = 0
+var stockIdMutex sync.Mutex = sync.Mutex{}
 var stocksMutex sync.Mutex = sync.Mutex{}
 var stocksByTicker map[string]domain.StockEntity = make(map[string]domain.StockEntity)
 
@@ -24,12 +24,12 @@ func NewStockRepository() BaseStockRepository {
 }
 
 func (repo StockRepository) Save(stock domain.StockEntity) error {
-	idMutex.Lock()
-	id = id + 1
-	idMutex.Unlock()
+	stockIdMutex.Lock()
+	stockId = stockId + 1
+	stockIdMutex.Unlock()
 
 	stocksMutex.Lock()
-	stock.ID = id
+	stock.ID = stockId
 	stocksByTicker[stock.Ticker] = stock
 	stocksMutex.Unlock()
 	return nil
