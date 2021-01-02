@@ -8,7 +8,11 @@ import (
 
 type StockOrderHandler struct{}
 
-func (StockOrderHandler) Handle(w http.ResponseWriter, r *http.Request) {
+func NewStockOrderHandler() http.Handler {
+	return StockOrderHandler{}
+}
+
+func (StockOrderHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		logrus.Info("GET order")
 	} else if r.Method == "POST" {

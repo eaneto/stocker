@@ -6,22 +6,22 @@ import (
 	"github.com/eaneto/stocker/handler"
 )
 
-var stockHandler handler.Handler
-var customerHandler handler.Handler
-var stockOrderHandler handler.Handler
+var stockHandler http.Handler
+var customerHandler http.Handler
+var stockOrderHandler http.Handler
 
 // init This is probably the most rudimentary way of doing dependency
 // injection.
 func init() {
 	stockHandler = handler.NewStockHandler()
 	customerHandler = handler.NewCustomerHandler()
-	stockOrderHandler = handler.StockOrderHandler{}
+	stockOrderHandler = handler.NewStockOrderHandler()
 }
 
 func main() {
-	http.HandleFunc("/stocks", stockHandler.Handle)
-	http.HandleFunc("/stocks/", stockHandler.Handle)
-	http.HandleFunc("/customers", customerHandler.Handle)
-	http.HandleFunc("/orders", stockOrderHandler.Handle)
+	http.HandleFunc("/stocks", stockHandler.ServeHTTP)
+	http.HandleFunc("/stocks/", stockHandler.ServeHTTP)
+	http.HandleFunc("/customers", customerHandler.ServeHTTP)
+	http.HandleFunc("/orders", stockOrderHandler.ServeHTTP)
 	http.ListenAndServe(":8888", nil)
 }

@@ -14,13 +14,13 @@ type CustomerHandler struct {
 	CustomerController controller.BaseCustomerController
 }
 
-func NewCustomerHandler() Handler {
+func NewCustomerHandler() http.Handler {
 	return CustomerHandler{
 		CustomerController: controller.NewCustomerController(),
 	}
 }
 
-func (handler CustomerHandler) Handle(w http.ResponseWriter, r *http.Request) {
+func (handler CustomerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		handler.handleGet(w, r)
 	} else if r.Method == "POST" {

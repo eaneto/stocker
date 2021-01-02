@@ -15,13 +15,13 @@ type StockHandler struct {
 	StockController controller.BaseStockController
 }
 
-func NewStockHandler() Handler {
+func NewStockHandler() http.Handler {
 	return StockHandler{
 		StockController: controller.NewStockController(),
 	}
 }
 
-func (handler StockHandler) Handle(w http.ResponseWriter, r *http.Request) {
+func (handler StockHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		handler.handleGet(w, r)
 	} else if r.Method == http.MethodPost {
