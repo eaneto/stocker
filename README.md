@@ -1,5 +1,6 @@
 # stocker
 
+![](https://github.com/eaneto/stocker/workflows/Stocker%20CI/badge.svg)
 [![codecov](https://codecov.io/gh/eaneto/stocker/branch/main/graph/badge.svg)](https://codecov.io/gh/eaneto/stocker)
 
 Bare bones.
