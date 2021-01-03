@@ -5,6 +5,7 @@ import (
 
 	"github.com/eaneto/stocker/domain"
 	"github.com/eaneto/stocker/repository"
+	"github.com/sirupsen/logrus"
 )
 
 type BaseStockService interface {
@@ -25,6 +26,19 @@ func NewStockService() BaseStockService {
 }
 
 func (service StockService) RegisterStock(stock domain.Stock) error {
+	_, err := service.SearchByTicker(stock.Ticker)
+	_, notFound := err.(domain.StockNotFoundError)
+	// If there are no stocks registered with the ticker.
+	if notFound {
+		return service.save(stock)
+	}
+	logrus.WithFields(logrus.Fields{
+		"ticker": stock.Ticker,
+	}).Warn("Already registered stock.")
+	return domain.AlreadyRegisteredStockError{Ticker: stock.Ticker}
+}
+
+func (service StockService) save(stock domain.Stock) error {
 	stockEntity := domain.StockEntity{
 		Ticker:    stock.Ticker,
 		Price:     stock.Price,

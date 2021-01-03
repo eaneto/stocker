@@ -5,18 +5,18 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/eaneto/stocker/controller"
 	"github.com/eaneto/stocker/domain"
+	"github.com/eaneto/stocker/service"
 	"github.com/sirupsen/logrus"
 )
 
 type CustomerHandler struct {
-	CustomerController controller.BaseCustomerController
+	CustomerService service.BaseCustomerService
 }
 
 func NewCustomerHandler() http.Handler {
 	return CustomerHandler{
-		CustomerController: controller.NewCustomerController(),
+		CustomerService: service.NewCustomerService(),
 	}
 }
 
@@ -32,7 +32,7 @@ func (handler CustomerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 
 func (handler CustomerHandler) handleGet(w http.ResponseWriter, r *http.Request) {
 	logrus.Info("GET customer")
-	customers, status := handler.CustomerController.FindAll()
+	customers := handler.CustomerService.FindAll()
 	payload, err := json.Marshal(customers)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
@@ -43,7 +43,6 @@ func (handler CustomerHandler) handleGet(w http.ResponseWriter, r *http.Request)
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(payload)
-	w.WriteHeader(status)
 }
 
 func (handler CustomerHandler) handlePost(w http.ResponseWriter, r *http.Request) {
@@ -65,6 +64,6 @@ func (handler CustomerHandler) handlePost(w http.ResponseWriter, r *http.Request
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	status := handler.CustomerController.Create(customer.Name)
-	w.WriteHeader(status)
+	handler.CustomerService.Create(customer.Name)
+	w.WriteHeader(http.StatusCreated)
 }

@@ -40,7 +40,10 @@ func TestRegisterStockWithSuccessShouldReturnNilError(t *testing.T) {
 		Ticker: "ABV9",
 		Price:  100,
 	}
+	stockEntity := domain.StockEntity{}
 
+	repository.On("FindByTicker", stock.Ticker).
+		Return(stockEntity, domain.StockNotFoundError{})
 	repository.On("Save", mock.Anything).Return(nil)
 
 	service := StockService{
@@ -61,6 +64,10 @@ func TestRegisterStockWithErrorShouldReturnError(t *testing.T) {
 		Price:  100,
 	}
 
+	stockEntity := domain.StockEntity{}
+
+	repository.On("FindByTicker", stock.Ticker).
+		Return(stockEntity, domain.StockNotFoundError{})
 	expectedError := errors.New("Error creating stock")
 	repository.On("Save", mock.Anything).Return(expectedError)
 
