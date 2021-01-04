@@ -85,7 +85,6 @@ func TestSaveTwoStockOrderFromSameCustomerShouldSaveByCodeAndCustomer(t *testing
 }
 
 func assertStockOrderEqual(t *testing.T, orderA, orderB domain.StockOrderEntity) {
-	assert.NotEqual(t, uint(0), orderB.ID)
 	assert.Equal(t, orderA.Amount, orderB.Amount)
 	assert.Equal(t, orderA.StockID, orderB.StockID)
 	assert.Equal(t, orderA.Status, orderB.Status)
@@ -106,7 +105,6 @@ func TestFindAllStockOrdersByCustomer(t *testing.T) {
 
 // clearAllStockOrders Clears all stored orders and resets id.
 func clearAllStockOrders() {
-	stockOrderId = 0
 	ordersByCode = make(map[uuid.UUID]domain.StockOrderEntity)
 	ordersByCustomer = make(map[uint][]domain.StockOrderEntity)
 }
