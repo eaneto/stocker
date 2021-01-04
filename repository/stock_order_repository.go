@@ -7,9 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
-var stockOrderId uint = 0
-var stockOrderIdMutex sync.Mutex = sync.Mutex{}
-var stockOrderMutex sync.Mutex = sync.Mutex{}
+var stockOrderMutex sync.RWMutex = sync.RWMutex{}
 
 // Orders by the order code.
 var ordersByCode map[uuid.UUID]domain.StockOrderEntity = make(map[uuid.UUID]domain.StockOrderEntity)
@@ -17,27 +15,49 @@ var ordersByCode map[uuid.UUID]domain.StockOrderEntity = make(map[uuid.UUID]doma
 // Orders by the customer id.
 var ordersByCustomer map[uint][]domain.StockOrderEntity = make(map[uint][]domain.StockOrderEntity)
 
-type BaseStockOrderRepository interface {
+type StockOrderRepository interface {
 	Save(stockOrder domain.StockOrderEntity) error
+	Update(stockOrder domain.StockOrderEntity) error
+	FindByCode(code uuid.UUID) (domain.StockOrderEntity, error)
 	FindAllByCustomer(customerID uint) []domain.StockOrderEntity
 }
 
-type StockOrderRepository struct{}
+type StockOrderRepositoryInMemory struct{}
 
-func (StockOrderRepository) Save(stockOrder domain.StockOrderEntity) error {
-	stockOrderIdMutex.Lock()
-	stockOrderId = stockOrderId + 1
-	stockOrderIdMutex.Unlock()
+func NewStockOrderRepository() StockOrderRepository {
+	return StockOrderRepositoryInMemory{}
+}
 
-	stockOrder.ID = stockOrderId
-
+func (StockOrderRepositoryInMemory) Save(stockOrder domain.StockOrderEntity) error {
 	stockOrderMutex.Lock()
 	ordersByCode[stockOrder.Code] = stockOrder
-	ordersByCustomer[stockOrder.CustomerID] = append(ordersByCustomer[stockOrder.CustomerID], stockOrder)
+	ordersByCustomer[stockOrder.CustomerID] = append(
+		ordersByCustomer[stockOrder.CustomerID], stockOrder)
 	stockOrderMutex.Unlock()
 	return nil
 }
 
-func (StockOrderRepository) FindAllByCustomer(customerID uint) []domain.StockOrderEntity {
+func (StockOrderRepositoryInMemory) Update(stockOrder domain.StockOrderEntity) error {
+	stockOrderMutex.Lock()
+	ordersByCode[stockOrder.Code] = stockOrder
+	// Updates the order on the customers list.
+	for index, order := range ordersByCustomer[stockOrder.CustomerID] {
+		if order.Code == order.Code {
+			ordersByCustomer[stockOrder.CustomerID][index] = order
+		}
+	}
+	stockOrderMutex.Unlock()
+	return nil
+}
+
+func (StockOrderRepositoryInMemory) FindByCode(code uuid.UUID) (domain.StockOrderEntity, error) {
+	order, ok := ordersByCode[code]
+	if ok {
+		return order, nil
+	}
+	return domain.StockOrderEntity{}, domain.StockOrderNotFoundError{Code: code}
+}
+
+func (StockOrderRepositoryInMemory) FindAllByCustomer(customerID uint) []domain.StockOrderEntity {
 	return ordersByCustomer[customerID]
 }

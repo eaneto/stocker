@@ -4,17 +4,15 @@ import (
 	"sync"
 
 	"github.com/eaneto/stocker/domain"
-	"github.com/google/uuid"
 )
 
 var customerId uint = 0
-var customerIdMutex sync.Mutex = sync.Mutex{}
-var customersMutex sync.Mutex = sync.Mutex{}
-var customersByCode map[uuid.UUID]domain.CustomerEntity = make(map[uuid.UUID]domain.CustomerEntity)
+var customerIdMutex sync.RWMutex = sync.RWMutex{}
+var customersMutex sync.RWMutex = sync.RWMutex{}
+var customersByID map[uint]domain.CustomerEntity = make(map[uint]domain.CustomerEntity)
 
 type BaseCustomerRepository interface {
 	Save(customer domain.CustomerEntity) error
-	FindByCode(code uuid.UUID) (domain.CustomerEntity, error)
 	FindAll() []domain.CustomerEntity
 }
 
@@ -31,23 +29,15 @@ func (CustomerRepository) Save(customer domain.CustomerEntity) error {
 
 	customer.ID = customerId
 	customersMutex.Lock()
-	customersByCode[customer.Code] = customer
+	customersByID[customer.ID] = customer
 	customersMutex.Unlock()
 	return nil
 }
 
-func (CustomerRepository) FindByCode(code uuid.UUID) (domain.CustomerEntity, error) {
-	customer, ok := customersByCode[code]
-	if ok {
-		return customer, nil
-	}
-	return domain.CustomerEntity{}, domain.CustomerNotFoundError{Code: code}
-}
-
 func (CustomerRepository) FindAll() []domain.CustomerEntity {
-	customers := make([]domain.CustomerEntity, len(customersByCode))
+	customers := make([]domain.CustomerEntity, len(customersByID))
 	i := 0
-	for _, customer := range customersByCode {
+	for _, customer := range customersByID {
 		customers[i] = customer
 		i = i + 1
 	}

@@ -7,8 +7,8 @@ import (
 )
 
 var stockId uint = 0
-var stockIdMutex sync.Mutex = sync.Mutex{}
-var stocksMutex sync.Mutex = sync.Mutex{}
+var stockIdMutex sync.RWMutex = sync.RWMutex{}
+var stocksMutex sync.RWMutex = sync.RWMutex{}
 
 // stocksByTicker Stocks by ticker.
 var stocksByTicker map[string]domain.StockEntity = make(map[string]domain.StockEntity)

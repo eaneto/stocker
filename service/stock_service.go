@@ -10,7 +10,7 @@ import (
 
 type BaseStockService interface {
 	RegisterStock(stock domain.Stock) error
-	SearchByTicker(ticker string) (domain.Stock, error)
+	SearchByTicker(ticker string) (domain.StockEntity, error)
 	FindAll() []domain.Stock
 	FindByID(id uint) (domain.StockEntity, error)
 }
@@ -47,12 +47,9 @@ func (service StockService) save(stock domain.Stock) error {
 	return service.StockRepository.Save(stockEntity)
 }
 
-func (service StockService) SearchByTicker(ticker string) (domain.Stock, error) {
+func (service StockService) SearchByTicker(ticker string) (domain.StockEntity, error) {
 	stockEntity, err := service.StockRepository.FindByTicker(ticker)
-	return domain.Stock{
-		Ticker: stockEntity.Ticker,
-		Price:  stockEntity.Price,
-	}, err
+	return stockEntity, err
 }
 
 func (service StockService) FindByID(id uint) (domain.StockEntity, error) {

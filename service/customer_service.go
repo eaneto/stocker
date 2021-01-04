@@ -5,12 +5,10 @@ import (
 
 	"github.com/eaneto/stocker/domain"
 	"github.com/eaneto/stocker/repository"
-	"github.com/google/uuid"
 )
 
 type BaseCustomerService interface {
 	Create(name string)
-	FindByCode(code uuid.UUID) (domain.CustomerEntity, error)
 	FindAll() []domain.Customer
 }
 
@@ -25,17 +23,11 @@ func NewCustomerService() BaseCustomerService {
 }
 
 func (service CustomerService) Create(name string) {
-	code, _ := uuid.NewRandom()
 	customer := domain.CustomerEntity{
 		Name:      name,
-		Code:      code,
 		CreatedAt: time.Now(),
 	}
 	service.CustomerRepository.Save(customer)
-}
-
-func (service CustomerService) FindByCode(code uuid.UUID) (domain.CustomerEntity, error) {
-	return service.CustomerRepository.FindByCode(code)
 }
 
 func (service CustomerService) FindAll() []domain.Customer {
@@ -43,8 +35,8 @@ func (service CustomerService) FindAll() []domain.Customer {
 	customers := make([]domain.Customer, len(customerEntities))
 	for i, entity := range customerEntities {
 		customers[i] = domain.Customer{
+			ID:   entity.ID,
 			Name: entity.Name,
-			Code: entity.Code,
 		}
 	}
 	return customers

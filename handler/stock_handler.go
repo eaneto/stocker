@@ -122,7 +122,10 @@ func (handler StockHandler) registerStock(stock domain.Stock) (httpStatus int) {
 func (handler StockHandler) findByTicker(ticker string) (domain.Stock, int) {
 	stock, err := handler.StockService.SearchByTicker(ticker)
 	if err == nil {
-		return stock, http.StatusOK
+		return domain.Stock{
+			Ticker: stock.Ticker,
+			Price:  stock.Price,
+		}, http.StatusOK
 	}
 	_, isNotFound := err.(domain.StockNotFoundError)
 	if isNotFound {

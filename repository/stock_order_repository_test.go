@@ -12,7 +12,7 @@ import (
 func TestSaveStockOrderShouldSaveByCodeAndCustomer(t *testing.T) {
 	clearAllStockOrders()
 
-	repository := StockOrderRepository{}
+	repository := StockOrderRepositoryInMemory{}
 	code, _ := uuid.NewRandom()
 	stockOrder := domain.StockOrderEntity{
 		Code:       code,
@@ -39,7 +39,7 @@ func TestSaveStockOrderShouldSaveByCodeAndCustomer(t *testing.T) {
 func TestSaveTwoStockOrderFromSameCustomerShouldSaveByCodeAndCustomer(t *testing.T) {
 	clearAllStockOrders()
 
-	repository := StockOrderRepository{}
+	repository := StockOrderRepositoryInMemory{}
 	code1, _ := uuid.NewRandom()
 	code2, _ := uuid.NewRandom()
 	customerID := uint(1)
@@ -96,7 +96,7 @@ func assertStockOrderEqual(t *testing.T, orderA, orderB domain.StockOrderEntity)
 func TestFindAllStockOrdersByCustomer(t *testing.T) {
 	clearAllStockOrders()
 
-	repository := StockOrderRepository{}
+	repository := StockOrderRepositoryInMemory{}
 	customerID := uint(1)
 
 	orders := repository.FindAllByCustomer(customerID)

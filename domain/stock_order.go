@@ -1,12 +1,21 @@
 package domain
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 )
 
 const STOCK_ORDER = "stock_order"
+
+type StockOrderNotFoundError struct {
+	Code uuid.UUID
+}
+
+func (e StockOrderNotFoundError) Error() string {
+	return fmt.Sprintf("Stock order not found. code=%s", e.Code)
+}
 
 type OrderStatus string
 
@@ -17,7 +26,6 @@ const (
 )
 
 type StockOrderEntity struct {
-	ID         uint
 	Code       uuid.UUID
 	CustomerID uint
 	StockID    uint
@@ -28,10 +36,10 @@ type StockOrderEntity struct {
 }
 
 type StockOrderRequest struct {
-	Code         uuid.UUID `json:"code"`
-	CustomerCode uuid.UUID `json:"customer_code"`
-	StockTicker  uint      `json:"stock_ticker"`
-	Amount       uint      `json:"amount"`
+	Code        uuid.UUID `json:"code"`
+	CustomerID  uint      `json:"customer_id"`
+	StockTicker string    `json:"stock_ticker"`
+	Amount      uint      `json:"amount"`
 }
 
 type StockPosition struct {
@@ -41,6 +49,6 @@ type StockPosition struct {
 }
 
 type CustomerPosition struct {
-	CustomerCode uuid.UUID       `json:"customer_code"`
-	Stocks       []StockPosition `json:"stock"`
+	CustomerID uint            `json:"customer_id"`
+	Stocks     []StockPosition `json:"stock"`
 }

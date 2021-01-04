@@ -31,7 +31,7 @@ func (handler CustomerHandler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 }
 
 func (handler CustomerHandler) handleGet(w http.ResponseWriter, r *http.Request) {
-	logrus.Info("GET customer")
+	logrus.Info("GET customers")
 	customers := handler.CustomerService.FindAll()
 	payload, err := json.Marshal(customers)
 	if err != nil {

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/eaneto/stocker/handler"
+	"github.com/eaneto/stocker/service"
 )
 
 var stockHandler http.Handler
@@ -19,6 +20,9 @@ func init() {
 }
 
 func main() {
+	stockOrderService := service.NewStockOrderService()
+	go stockOrderService.ConfirmOrders()
+
 	http.HandleFunc("/stocks", stockHandler.ServeHTTP)
 	http.HandleFunc("/stocks/", stockHandler.ServeHTTP)
 	http.HandleFunc("/customers", customerHandler.ServeHTTP)
