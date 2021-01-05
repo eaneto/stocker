@@ -16,7 +16,7 @@ type BaseStockService interface {
 }
 
 type StockService struct {
-	StockRepository repository.BaseStockRepository
+	StockRepository repository.StockRepository
 }
 
 func NewStockService() BaseStockService {

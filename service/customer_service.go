@@ -13,7 +13,7 @@ type BaseCustomerService interface {
 }
 
 type CustomerService struct {
-	CustomerRepository repository.BaseCustomerRepository
+	CustomerRepository repository.CustomerRepository
 }
 
 func NewCustomerService() BaseCustomerService {

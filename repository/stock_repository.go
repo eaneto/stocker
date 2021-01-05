@@ -16,20 +16,20 @@ var stocksByTicker map[string]domain.StockEntity = make(map[string]domain.StockE
 // stocksByID Stocks by stock id.
 var stocksByID map[uint]domain.StockEntity = make(map[uint]domain.StockEntity)
 
-type BaseStockRepository interface {
+type StockRepository interface {
 	Save(stock domain.StockEntity) error
 	FindByTicker(ticker string) (domain.StockEntity, error)
 	FindAll() []domain.StockEntity
 	FindByID(id uint) (domain.StockEntity, error)
 }
 
-type StockRepository struct{}
+type StockRepositoryInMemory struct{}
 
-func NewStockRepository() BaseStockRepository {
-	return StockRepository{}
+func NewStockRepository() StockRepository {
+	return StockRepositoryInMemory{}
 }
 
-func (StockRepository) Save(stock domain.StockEntity) error {
+func (StockRepositoryInMemory) Save(stock domain.StockEntity) error {
 	stockIdMutex.Lock()
 	stockId = stockId + 1
 	stockIdMutex.Unlock()
@@ -42,7 +42,7 @@ func (StockRepository) Save(stock domain.StockEntity) error {
 	return nil
 }
 
-func (StockRepository) FindByTicker(ticker string) (domain.StockEntity, error) {
+func (StockRepositoryInMemory) FindByTicker(ticker string) (domain.StockEntity, error) {
 	stock, ok := stocksByTicker[ticker]
 	if ok {
 		return stock, nil
@@ -50,7 +50,7 @@ func (StockRepository) FindByTicker(ticker string) (domain.StockEntity, error) {
 	return domain.StockEntity{}, domain.StockNotFoundError{Ticker: ticker}
 }
 
-func (StockRepository) FindAll() []domain.StockEntity {
+func (StockRepositoryInMemory) FindAll() []domain.StockEntity {
 	stocks := make([]domain.StockEntity, len(stocksByTicker))
 	i := 0
 	for _, stock := range stocksByTicker {
@@ -60,7 +60,7 @@ func (StockRepository) FindAll() []domain.StockEntity {
 	return stocks
 }
 
-func (StockRepository) FindByID(id uint) (domain.StockEntity, error) {
+func (StockRepositoryInMemory) FindByID(id uint) (domain.StockEntity, error) {
 	stock, ok := stocksByID[id]
 	if ok {
 		return stock, nil

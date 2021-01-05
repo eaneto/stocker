@@ -11,18 +11,18 @@ var customerIdMutex sync.RWMutex = sync.RWMutex{}
 var customersMutex sync.RWMutex = sync.RWMutex{}
 var customersByID map[uint]domain.CustomerEntity = make(map[uint]domain.CustomerEntity)
 
-type BaseCustomerRepository interface {
+type CustomerRepository interface {
 	Save(customer domain.CustomerEntity) error
 	FindAll() []domain.CustomerEntity
 }
 
-type CustomerRepository struct{}
+type CustomerRepositoryInMemory struct{}
 
-func NewCustomerRepository() BaseCustomerRepository {
-	return CustomerRepository{}
+func NewCustomerRepository() CustomerRepository {
+	return CustomerRepositoryInMemory{}
 }
 
-func (CustomerRepository) Save(customer domain.CustomerEntity) error {
+func (CustomerRepositoryInMemory) Save(customer domain.CustomerEntity) error {
 	customerIdMutex.Lock()
 	customerId = customerId + 1
 	customerIdMutex.Unlock()
@@ -34,7 +34,7 @@ func (CustomerRepository) Save(customer domain.CustomerEntity) error {
 	return nil
 }
 
-func (CustomerRepository) FindAll() []domain.CustomerEntity {
+func (CustomerRepositoryInMemory) FindAll() []domain.CustomerEntity {
 	customers := make([]domain.CustomerEntity, len(customersByID))
 	i := 0
 	for _, customer := range customersByID {

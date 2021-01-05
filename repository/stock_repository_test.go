@@ -10,7 +10,7 @@ import (
 func TestSaveStockShouldSaveStockOnMap(t *testing.T) {
 	clearAllStocks()
 
-	repository := StockRepository{}
+	repository := StockRepositoryInMemory{}
 
 	stock := domain.StockEntity{
 		Ticker: "ABC",
@@ -36,7 +36,7 @@ func TestFindStockByTicker(t *testing.T) {
 	stocks[stock.Ticker] = stock
 	stocksByTicker = stocks
 
-	repository := StockRepository{}
+	repository := StockRepositoryInMemory{}
 
 	foundStock, err := repository.FindByTicker(stock.Ticker)
 
@@ -52,7 +52,7 @@ func TestFindStockByTickerNonExistentStock(t *testing.T) {
 		ID:     1,
 		Ticker: "ABC",
 	}
-	repository := StockRepository{}
+	repository := StockRepositoryInMemory{}
 
 	_, err := repository.FindByTicker(stock.Ticker)
 
@@ -72,7 +72,7 @@ func TestFindStockByID(t *testing.T) {
 	stocks[stock.Ticker] = stock
 	stocksByTicker = stocks
 
-	repository := StockRepository{}
+	repository := StockRepositoryInMemory{}
 
 	foundStock, err := repository.FindByID(stock.ID)
 
@@ -88,7 +88,7 @@ func TestFindStockByIDNonExistentStockShouldReturnError(t *testing.T) {
 		ID:     1,
 		Ticker: "ABC",
 	}
-	repository := StockRepository{}
+	repository := StockRepositoryInMemory{}
 
 	_, err := repository.FindByTicker(stock.Ticker)
 
@@ -100,7 +100,7 @@ func TestFindStockByIDNonExistentStockShouldReturnError(t *testing.T) {
 func TestFindAllStocksWithNoneRegisteredShouldReturnEmptySlice(t *testing.T) {
 	clearAllStocks()
 
-	repository := StockRepository{}
+	repository := StockRepositoryInMemory{}
 
 	stocks := repository.FindAll()
 
@@ -118,7 +118,7 @@ func TestFindAllStocksWithOneRegisteredShouldReturnSliceWithOneElement(t *testin
 	stocks[stock.Ticker] = stock
 	stocksByTicker = stocks
 
-	repository := StockRepository{}
+	repository := StockRepositoryInMemory{}
 
 	foundStocks := repository.FindAll()
 

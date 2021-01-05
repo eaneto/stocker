@@ -11,7 +11,7 @@ import (
 func TestSaveCustomerShouldSaveOnMap(t *testing.T) {
 	clearAllCustomers()
 
-	repository := CustomerRepository{}
+	repository := CustomerRepositoryInMemory{}
 
 	customer := domain.CustomerEntity{
 		Name:      "Edison",
@@ -30,7 +30,7 @@ func TestSaveCustomerShouldSaveOnMap(t *testing.T) {
 func TestFindAllCustomersWithNoneRegisteredShouldReturnEmptySlice(t *testing.T) {
 	clearAllCustomers()
 
-	repository := CustomerRepository{}
+	repository := CustomerRepositoryInMemory{}
 
 	customers := repository.FindAll()
 
@@ -49,7 +49,7 @@ func TestFindAllCustomersWithOneRegisteredShouldReturnSliceWithOneElement(t *tes
 	customers[id] = customer
 	customersByID = customers
 
-	repository := CustomerRepository{}
+	repository := CustomerRepositoryInMemory{}
 
 	foundCustomers := repository.FindAll()
 
