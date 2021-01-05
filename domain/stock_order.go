@@ -17,6 +17,14 @@ func (e StockOrderNotFoundError) Error() string {
 	return fmt.Sprintf("Stock order not found. code=%s", e.Code)
 }
 
+type StockOrderAlreadyProcessedError struct {
+	Code uuid.UUID
+}
+
+func (e StockOrderAlreadyProcessedError) Error() string {
+	return fmt.Sprintf("Stock order already processed. code=%s", e.Code)
+}
+
 type OrderStatus string
 
 const (

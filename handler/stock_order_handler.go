@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/eaneto/stocker/domain"
 	"github.com/eaneto/stocker/service"
@@ -22,11 +24,26 @@ func NewStockOrderHandler() http.Handler {
 
 func (handler StockOrderHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		logrus.Info("GET order")
+		handler.handleGet(w, r)
 	} else if r.Method == "POST" {
 		handler.handlePost(w, r)
 	} else {
 		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
+}
+
+func (handler StockOrderHandler) handleGet(w http.ResponseWriter, r *http.Request) {
+	customerID := strings.TrimPrefix(r.URL.Path, "/orders")
+	if customerID == "" || customerID == "/" {
+		logrus.Info("GET all orders")
+	} else {
+		logrus.Info("GET customer position")
+		customerID = strings.ReplaceAll(customerID, "/", "")
+		customer, _ := strconv.Atoi(customerID)
+		position, _ := handler.StockOrderService.GetCustomerPosition(uint(customer))
+		payload, _ := json.Marshal(position)
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(payload)
 	}
 }
 
@@ -50,6 +67,11 @@ func (handler StockOrderHandler) handlePost(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	err = handler.StockOrderService.CreateOrder(stockOrderRequest)
+	_, alreadyProcessed := err.(domain.StockOrderAlreadyProcessedError)
+	if alreadyProcessed {
+		w.WriteHeader(http.StatusConflict)
+		return
+	}
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
 			"error": err,

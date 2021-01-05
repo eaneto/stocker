@@ -27,5 +27,6 @@ func main() {
 	http.HandleFunc("/stocks/", stockHandler.ServeHTTP)
 	http.HandleFunc("/customers", customerHandler.ServeHTTP)
 	http.HandleFunc("/orders", stockOrderHandler.ServeHTTP)
+	http.HandleFunc("/orders/", stockOrderHandler.ServeHTTP)
 	http.ListenAndServe(":8888", nil)
 }

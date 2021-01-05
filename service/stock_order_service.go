@@ -38,6 +38,12 @@ func (service StockOrderService) CreateOrder(stockOrderRequest domain.StockOrder
 		return err
 	}
 
+	_, err = service.StockOrderRepository.FindByCode(stockOrderRequest.Code)
+	_, notFound := err.(domain.StockOrderNotFoundError)
+	if !notFound {
+		return domain.StockOrderAlreadyProcessedError{Code: stockOrderRequest.Code}
+	}
+
 	stockOrder := domain.StockOrderEntity{
 		CustomerID: stockOrderRequest.CustomerID,
 		StockID:    stock.ID,
@@ -47,7 +53,6 @@ func (service StockOrderService) CreateOrder(stockOrderRequest domain.StockOrder
 		CreatedAt:  time.Now(),
 		UpdatedAt:  time.Now(),
 	}
-	// TODO idempotence
 	service.StockOrderRepository.Save(stockOrder)
 	// Publish the request to the stock order channel
 	orderRequests <- stockOrderRequest
@@ -94,6 +99,7 @@ func (service StockOrderService) GetCustomerPosition(customerID uint) (domain.Cu
 	stocks := make([]domain.StockPosition, len(orderAmountByID))
 	// Loop through all orders to summarize the orders into a stock
 	// position.
+	i := 0
 	for id, amount := range orderAmountByID {
 		// Ignore if stock not found because it's an impossible case
 		stock, _ := service.StockService.FindByID(id)
@@ -102,7 +108,8 @@ func (service StockOrderService) GetCustomerPosition(customerID uint) (domain.Cu
 			Price:  stock.Price,
 			Amount: amount,
 		}
-		stocks = append(stocks, stockPosition)
+		stocks[i] = stockPosition
+		i++
 	}
 	position := domain.CustomerPosition{
 		CustomerID: customerID,
