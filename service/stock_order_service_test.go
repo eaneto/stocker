@@ -2,6 +2,7 @@ package service
 
 import (
 	"testing"
+	"time"
 
 	"github.com/eaneto/stocker/domain"
 	"github.com/google/uuid"
@@ -69,7 +70,51 @@ func TestGetCustomerPositionWithNoneRegisteredStockShouldReturnEmptyPosition(t *
 	stockOrderRepositoryMock.On("FindAllByCustomer", customerID).
 		Return([]domain.StockOrderEntity{})
 
-	_, err := orderService.GetCustomerPosition(customerID)
+	position, err := orderService.GetCustomerPosition(customerID)
 
 	assert.Nil(t, err)
+	assert.Empty(t, position.Stocks)
+}
+
+func TestGetCustomerPositionWithOneRegisteredStockShouldReturnPositionWithThisStock(t *testing.T) {
+	stockOrderRepositoryMock := new(StockOrderRepositoryMock)
+	stockServiceMock := new(StockServiceMock)
+
+	orderService := StockOrderService{
+		StockOrderRepository: stockOrderRepositoryMock,
+		StockService:         stockServiceMock,
+	}
+	customerID := uint(1)
+	code, _ := uuid.NewRandom()
+	orders := []domain.StockOrderEntity{
+		{
+			Code:       code,
+			StockID:    1,
+			CustomerID: customerID,
+			Amount:     100,
+			Status:     domain.Created,
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
+		},
+	}
+	stock := domain.StockEntity{
+		ID:     orders[0].StockID,
+		Ticker: "STCK9",
+		Price:  1000,
+	}
+
+	stockOrderRepositoryMock.On("FindAllByCustomer", customerID).
+		Return(orders)
+	stockServiceMock.On("FindByID", orders[0].StockID).Return(stock, nil)
+
+	position, err := orderService.GetCustomerPosition(customerID)
+
+	assert.Nil(t, err)
+	assert.Equal(t, position.CustomerID, customerID)
+	assert.NotEmpty(t, position.Stocks)
+	assert.Equal(t, len(orders), len(position.Stocks))
+	stockPosition := position.Stocks[0]
+	assert.Equal(t, stock.Price, stockPosition.Price)
+	assert.Equal(t, stock.Ticker, stockPosition.Ticker)
+	assert.Equal(t, orders[0].Amount, stockPosition.Amount)
 }
