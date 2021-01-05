@@ -24,7 +24,7 @@ func NewCustomerRepository() CustomerRepository {
 
 func (CustomerRepositoryInMemory) Save(customer domain.CustomerEntity) error {
 	customerIdMutex.Lock()
-	customerId = customerId + 1
+	customerId++
 	customerIdMutex.Unlock()
 
 	customer.ID = customerId
@@ -39,7 +39,7 @@ func (CustomerRepositoryInMemory) FindAll() []domain.CustomerEntity {
 	i := 0
 	for _, customer := range customersByID {
 		customers[i] = customer
-		i = i + 1
+		i++
 	}
 	return customers
 }

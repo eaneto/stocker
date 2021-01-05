@@ -11,8 +11,6 @@ var stockHandler http.Handler
 var customerHandler http.Handler
 var stockOrderHandler http.Handler
 
-// init This is probably the most rudimentary way of doing dependency
-// injection.
 func init() {
 	stockHandler = handler.NewStockHandler()
 	customerHandler = handler.NewCustomerHandler()

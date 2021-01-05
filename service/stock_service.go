@@ -43,13 +43,13 @@ func (service StockService) save(stock domain.Stock) error {
 		Ticker:    stock.Ticker,
 		Price:     stock.Price,
 		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 	return service.StockRepository.Save(stockEntity)
 }
 
 func (service StockService) SearchByTicker(ticker string) (domain.StockEntity, error) {
-	stockEntity, err := service.StockRepository.FindByTicker(ticker)
-	return stockEntity, err
+	return service.StockRepository.FindByTicker(ticker)
 }
 
 func (service StockService) FindByID(id uint) (domain.StockEntity, error) {

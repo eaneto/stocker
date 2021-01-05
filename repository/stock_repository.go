@@ -31,11 +31,11 @@ func NewStockRepository() StockRepository {
 
 func (StockRepositoryInMemory) Save(stock domain.StockEntity) error {
 	stockIdMutex.Lock()
-	stockId = stockId + 1
+	stockId++
 	stockIdMutex.Unlock()
 
-	stocksMutex.Lock()
 	stock.ID = stockId
+	stocksMutex.Lock()
 	stocksByTicker[stock.Ticker] = stock
 	stocksByID[stock.ID] = stock
 	stocksMutex.Unlock()
@@ -55,7 +55,7 @@ func (StockRepositoryInMemory) FindAll() []domain.StockEntity {
 	i := 0
 	for _, stock := range stocksByTicker {
 		stocks[i] = stock
-		i = i + 1
+		i++
 	}
 	return stocks
 }

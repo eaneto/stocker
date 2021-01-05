@@ -91,15 +91,20 @@ func (service StockOrderService) FindAllByCustomer(customerID uint) []domain.Sto
 func (service StockOrderService) GetCustomerPosition(customerID uint) (domain.CustomerPosition, error) {
 	// Get all orders from customer id
 	orders := service.StockOrderRepository.FindAllByCustomer(customerID)
-	// Map orders to domain.CustomerPosition
-	orderAmountByID := make(map[uint]uint)
-	for _, order := range orders {
-		orderAmountByID[order.StockID] = orderAmountByID[order.StockID] + order.Amount
+	orderAmountByID := summarizeOrdersByStock(orders)
+	stocks := service.mapOrdersToStockPosition(orderAmountByID)
+	position := domain.CustomerPosition{
+		CustomerID: customerID,
+		Stocks:     stocks,
 	}
-	stocks := make([]domain.StockPosition, len(orderAmountByID))
-	// Loop through all orders to summarize the orders into a stock
-	// position.
+	return position, nil
+}
+
+// mapOrdersToStockPosition Maps a map of the amounts by the stock id
+// to a list of domain.StockPosition.
+func (service StockOrderService) mapOrdersToStockPosition(orderAmountByID map[uint]uint) []domain.StockPosition {
 	i := 0
+	stocks := make([]domain.StockPosition, len(orderAmountByID))
 	for id, amount := range orderAmountByID {
 		// Ignore if stock not found because it's an impossible case
 		stock, _ := service.StockService.FindByID(id)
@@ -111,9 +116,14 @@ func (service StockOrderService) GetCustomerPosition(customerID uint) (domain.Cu
 		stocks[i] = stockPosition
 		i++
 	}
-	position := domain.CustomerPosition{
-		CustomerID: customerID,
-		Stocks:     stocks,
+	return stocks
+}
+
+// summarizeOrdersByStock Summarize a list of orders by the stock id.
+func summarizeOrdersByStock(orders []domain.StockOrderEntity) map[uint]uint {
+	orderAmountByID := make(map[uint]uint)
+	for _, order := range orders {
+		orderAmountByID[order.StockID] = orderAmountByID[order.StockID] + order.Amount
 	}
-	return position, nil
+	return orderAmountByID
 }
