@@ -10,11 +10,13 @@ import (
 var stockHandler http.Handler
 var customerHandler http.Handler
 var stockOrderHandler http.Handler
+var customerPositionHandler http.Handler
 
 func init() {
 	stockHandler = handler.NewStockHandler()
 	customerHandler = handler.NewCustomerHandler()
 	stockOrderHandler = handler.NewStockOrderHandler()
+	customerPositionHandler = handler.NewCustomerPositionHandler()
 }
 
 func main() {
@@ -26,5 +28,6 @@ func main() {
 	http.HandleFunc("/customers", customerHandler.ServeHTTP)
 	http.HandleFunc("/orders", stockOrderHandler.ServeHTTP)
 	http.HandleFunc("/orders/", stockOrderHandler.ServeHTTP)
+	http.HandleFunc("/positions/", customerPositionHandler.ServeHTTP)
 	http.ListenAndServe(":8888", nil)
 }
