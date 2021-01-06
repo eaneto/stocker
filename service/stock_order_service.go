@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var orderRequests chan domain.StockOrderRequest = make(chan domain.StockOrderRequest)
+var orderRequestsChannel chan domain.StockOrderRequest = make(chan domain.StockOrderRequest)
 
 type BaseStockOrderService interface {
 	// CreateOrder Creates an order.
@@ -55,14 +55,16 @@ func (service StockOrderService) CreateOrder(stockOrderRequest domain.StockOrder
 	}
 	service.StockOrderRepository.Save(stockOrder)
 	// Publish the request to the stock order channel
-	orderRequests <- stockOrderRequest
+	orderRequestsChannel <- stockOrderRequest
 	return nil
 }
 
 func (service StockOrderService) ConfirmOrders() {
 	for {
 		select {
-		case orderRequest := <-orderRequests:
+		case orderRequest := <-orderRequestsChannel:
+			// Expensive computation
+			time.Sleep(time.Second * 2)
 			service.confirmOrder(orderRequest)
 		}
 	}
