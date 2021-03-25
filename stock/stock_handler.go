@@ -1,4 +1,4 @@
-package handler
+package stock
 
 import (
 	"encoding/json"
@@ -6,18 +6,16 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/eaneto/stocker/domain"
-	"github.com/eaneto/stocker/service"
 	"github.com/sirupsen/logrus"
 )
 
 type StockHandler struct {
-	StockService service.BaseStockService
+	StockService BaseStockService
 }
 
 func NewStockHandler() http.Handler {
 	return StockHandler{
-		StockService: service.NewStockService(),
+		StockService: NewStockService(),
 	}
 }
 
@@ -92,7 +90,7 @@ func (handler StockHandler) handlePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	stock := domain.Stock{}
+	stock := Stock{}
 	err = json.Unmarshal(body, &stock)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
@@ -106,12 +104,12 @@ func (handler StockHandler) handlePost(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(status)
 }
 
-func (handler StockHandler) registerStock(stock domain.Stock) (httpStatus int) {
+func (handler StockHandler) registerStock(stock Stock) (httpStatus int) {
 	err := handler.StockService.RegisterStock(stock)
 	if err == nil {
 		return http.StatusCreated
 	}
-	_, isConflicError := err.(domain.AlreadyRegisteredStockError)
+	_, isConflicError := err.(AlreadyRegisteredStockError)
 	if isConflicError {
 		return http.StatusConflict
 	} else {
@@ -119,21 +117,21 @@ func (handler StockHandler) registerStock(stock domain.Stock) (httpStatus int) {
 	}
 }
 
-func (handler StockHandler) findByTicker(ticker string) (domain.Stock, int) {
+func (handler StockHandler) findByTicker(ticker string) (Stock, int) {
 	stock, err := handler.StockService.SearchByTicker(ticker)
 	if err == nil {
-		return domain.Stock{
+		return Stock{
 			Ticker: stock.Ticker,
 			Price:  stock.Price,
 		}, http.StatusOK
 	}
-	_, isNotFound := err.(domain.StockNotFoundError)
+	_, isNotFound := err.(StockNotFoundError)
 	if isNotFound {
-		return domain.Stock{}, http.StatusNotFound
+		return Stock{}, http.StatusNotFound
 	}
-	return domain.Stock{}, http.StatusInternalServerError
+	return Stock{}, http.StatusInternalServerError
 }
 
-func (handler StockHandler) findAll() ([]domain.Stock, int) {
+func (handler StockHandler) findAll() ([]Stock, int) {
 	return handler.StockService.FindAll(), http.StatusOK
 }

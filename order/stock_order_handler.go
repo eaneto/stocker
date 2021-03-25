@@ -1,4 +1,4 @@
-package handler
+package order
 
 import (
 	"encoding/json"
@@ -6,18 +6,16 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/eaneto/stocker/domain"
-	"github.com/eaneto/stocker/service"
 	"github.com/sirupsen/logrus"
 )
 
 type StockOrderHandler struct {
-	StockOrderService service.BaseStockOrderService
+	StockOrderService BaseStockOrderService
 }
 
 func NewStockOrderHandler() http.Handler {
 	return StockOrderHandler{
-		StockOrderService: service.NewStockOrderService(),
+		StockOrderService: NewStockOrderService(),
 	}
 }
 
@@ -51,7 +49,7 @@ func (handler StockOrderHandler) handlePost(w http.ResponseWriter, r *http.Reque
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	stockOrderRequest := domain.StockOrderRequest{}
+	stockOrderRequest := StockOrderRequest{}
 	err = json.Unmarshal(body, &stockOrderRequest)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{
@@ -61,7 +59,7 @@ func (handler StockOrderHandler) handlePost(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	err = handler.StockOrderService.CreateOrder(stockOrderRequest)
-	_, alreadyProcessed := err.(domain.StockOrderAlreadyProcessedError)
+	_, alreadyProcessed := err.(StockOrderAlreadyProcessedError)
 	if alreadyProcessed {
 		w.WriteHeader(http.StatusConflict)
 		return

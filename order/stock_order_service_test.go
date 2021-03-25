@@ -1,10 +1,10 @@
-package service
+package order
 
 import (
 	"testing"
 	"time"
 
-	"github.com/eaneto/stocker/domain"
+	"github.com/eaneto/stocker/stock"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -14,47 +14,47 @@ type StockOrderRepositoryMock struct {
 	mock.Mock
 }
 
-func (m *StockOrderRepositoryMock) Save(stockOrder domain.StockOrderEntity) error {
+func (m *StockOrderRepositoryMock) Save(stockOrder StockOrderEntity) error {
 	args := m.Called(stockOrder)
 	return args.Error(0)
 }
 
-func (m *StockOrderRepositoryMock) Update(stockOrder domain.StockOrderEntity) error {
+func (m *StockOrderRepositoryMock) Update(stockOrder StockOrderEntity) error {
 	args := m.Called(stockOrder)
 	return args.Error(0)
 }
 
-func (m *StockOrderRepositoryMock) FindByCode(code uuid.UUID) (domain.StockOrderEntity, error) {
+func (m *StockOrderRepositoryMock) FindByCode(code uuid.UUID) (StockOrderEntity, error) {
 	args := m.Called(code)
-	return args.Get(0).(domain.StockOrderEntity), args.Error(1)
+	return args.Get(0).(StockOrderEntity), args.Error(1)
 }
 
-func (m *StockOrderRepositoryMock) FindAllByCustomer(customerID uint) []domain.StockOrderEntity {
+func (m *StockOrderRepositoryMock) FindAllByCustomer(customerID uint) []StockOrderEntity {
 	args := m.Called(customerID)
-	return args.Get(0).([]domain.StockOrderEntity)
+	return args.Get(0).([]StockOrderEntity)
 }
 
 type StockServiceMock struct {
 	mock.Mock
 }
 
-func (m *StockServiceMock) RegisterStock(stock domain.Stock) error {
+func (m *StockServiceMock) RegisterStock(stock stock.Stock) error {
 	args := m.Called(stock)
 	return args.Error(0)
 }
 
-func (m *StockServiceMock) SearchByTicker(ticker string) (domain.StockEntity, error) {
+func (m *StockServiceMock) SearchByTicker(ticker string) (stock.StockEntity, error) {
 	args := m.Called(ticker)
-	return args.Get(0).(domain.StockEntity), args.Error(1)
+	return args.Get(0).(stock.StockEntity), args.Error(1)
 }
-func (m *StockServiceMock) FindAll() []domain.Stock {
+func (m *StockServiceMock) FindAll() []stock.Stock {
 	args := m.Called()
-	return args.Get(0).([]domain.Stock)
+	return args.Get(0).([]stock.Stock)
 }
 
-func (m *StockServiceMock) FindByID(id uint) (domain.StockEntity, error) {
+func (m *StockServiceMock) FindByID(id uint) (stock.StockEntity, error) {
 	args := m.Called(id)
-	return args.Get(0).(domain.StockEntity), args.Error(1)
+	return args.Get(0).(stock.StockEntity), args.Error(1)
 }
 
 func TestGetCustomerPositionWithNoneRegisteredStockShouldReturnEmptyPosition(t *testing.T) {
@@ -68,7 +68,7 @@ func TestGetCustomerPositionWithNoneRegisteredStockShouldReturnEmptyPosition(t *
 
 	customerID := uint(1)
 	stockOrderRepositoryMock.On("FindAllByCustomer", customerID).
-		Return([]domain.StockOrderEntity{})
+		Return([]StockOrderEntity{})
 
 	position, err := orderService.GetCustomerPosition(customerID)
 
@@ -86,18 +86,18 @@ func TestGetCustomerPositionWithOneRegisteredStockShouldReturnPositionWithThisSt
 	}
 	customerID := uint(1)
 	code, _ := uuid.NewRandom()
-	orders := []domain.StockOrderEntity{
+	orders := []StockOrderEntity{
 		{
 			Code:       code,
 			StockID:    1,
 			CustomerID: customerID,
 			Amount:     100,
-			Status:     domain.Created,
+			Status:     Created,
 			CreatedAt:  time.Now(),
 			UpdatedAt:  time.Now(),
 		},
 	}
-	stock := domain.StockEntity{
+	stock := stock.StockEntity{
 		ID:     orders[0].StockID,
 		Ticker: "STCK9",
 		Price:  1000,

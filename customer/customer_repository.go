@@ -1,19 +1,17 @@
-package repository
+package customer
 
 import (
 	"sync"
-
-	"github.com/eaneto/stocker/domain"
 )
 
 var customerId uint = 0
 var customerIdMutex sync.RWMutex = sync.RWMutex{}
 var customersMutex sync.RWMutex = sync.RWMutex{}
-var customersByID map[uint]domain.CustomerEntity = make(map[uint]domain.CustomerEntity)
+var customersByID map[uint]CustomerEntity = make(map[uint]CustomerEntity)
 
 type CustomerRepository interface {
-	Save(customer domain.CustomerEntity) error
-	FindAll() []domain.CustomerEntity
+	Save(customer CustomerEntity) error
+	FindAll() []CustomerEntity
 }
 
 type CustomerRepositoryInMemory struct{}
@@ -22,7 +20,7 @@ func NewCustomerRepository() CustomerRepository {
 	return CustomerRepositoryInMemory{}
 }
 
-func (CustomerRepositoryInMemory) Save(customer domain.CustomerEntity) error {
+func (CustomerRepositoryInMemory) Save(customer CustomerEntity) error {
 	customerIdMutex.Lock()
 	customerId++
 	customerIdMutex.Unlock()
@@ -34,8 +32,8 @@ func (CustomerRepositoryInMemory) Save(customer domain.CustomerEntity) error {
 	return nil
 }
 
-func (CustomerRepositoryInMemory) FindAll() []domain.CustomerEntity {
-	customers := make([]domain.CustomerEntity, len(customersByID))
+func (CustomerRepositoryInMemory) FindAll() []CustomerEntity {
+	customers := make([]CustomerEntity, len(customersByID))
 	i := 0
 	for _, customer := range customersByID {
 		customers[i] = customer

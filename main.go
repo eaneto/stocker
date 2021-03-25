@@ -3,8 +3,9 @@ package main
 import (
 	"net/http"
 
-	"github.com/eaneto/stocker/handler"
-	"github.com/eaneto/stocker/service"
+	"github.com/eaneto/stocker/customer"
+	"github.com/eaneto/stocker/order"
+	"github.com/eaneto/stocker/stock"
 )
 
 var stockHandler http.Handler
@@ -13,14 +14,14 @@ var stockOrderHandler http.Handler
 var customerPositionHandler http.Handler
 
 func init() {
-	stockHandler = handler.NewStockHandler()
-	customerHandler = handler.NewCustomerHandler()
-	stockOrderHandler = handler.NewStockOrderHandler()
-	customerPositionHandler = handler.NewCustomerPositionHandler()
+	stockHandler = stock.NewStockHandler()
+	customerHandler = customer.NewCustomerHandler()
+	stockOrderHandler = order.NewStockOrderHandler()
+	customerPositionHandler = order.NewCustomerPositionHandler()
 }
 
 func main() {
-	stockOrderService := service.NewStockOrderService()
+	stockOrderService := order.NewStockOrderService()
 	go stockOrderService.ConfirmOrders()
 
 	http.HandleFunc("/stocks", stockHandler.ServeHTTP)

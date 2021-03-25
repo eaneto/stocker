@@ -1,4 +1,4 @@
-package domain
+package stock
 
 import (
 	"fmt"
@@ -38,11 +38,4 @@ type StockEntity struct {
 	Price     uint
 	CreatedAt time.Time
 	UpdatedAt time.Time
-}
-
-type StockHistoryEntity struct {
-	ID        uint
-	StockID   uint
-	Price     uint
-	CreatedAt time.Time
 }

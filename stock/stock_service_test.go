@@ -1,10 +1,9 @@
-package service
+package stock
 
 import (
 	"errors"
 	"testing"
 
-	"github.com/eaneto/stocker/domain"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -13,37 +12,37 @@ type StockRepositoryMock struct {
 	mock.Mock
 }
 
-func (m *StockRepositoryMock) Save(stock domain.StockEntity) error {
+func (m *StockRepositoryMock) Save(stock StockEntity) error {
 	args := m.Called(stock)
 	return args.Error(0)
 }
 
-func (m *StockRepositoryMock) FindByTicker(ticker string) (domain.StockEntity, error) {
+func (m *StockRepositoryMock) FindByTicker(ticker string) (StockEntity, error) {
 	args := m.Called(ticker)
-	return args.Get(0).(domain.StockEntity), args.Error(1)
+	return args.Get(0).(StockEntity), args.Error(1)
 }
 
-func (m *StockRepositoryMock) FindByID(id uint) (domain.StockEntity, error) {
+func (m *StockRepositoryMock) FindByID(id uint) (StockEntity, error) {
 	args := m.Called(id)
-	return args.Get(0).(domain.StockEntity), args.Error(1)
+	return args.Get(0).(StockEntity), args.Error(1)
 }
 
-func (m *StockRepositoryMock) FindAll() []domain.StockEntity {
+func (m *StockRepositoryMock) FindAll() []StockEntity {
 	args := m.Called()
-	return args.Get(0).([]domain.StockEntity)
+	return args.Get(0).([]StockEntity)
 }
 
 func TestRegisterStockWithSuccessShouldReturnNilError(t *testing.T) {
 	repository := new(StockRepositoryMock)
 
-	stock := domain.Stock{
+	stock := Stock{
 		Ticker: "ABV9",
 		Price:  100,
 	}
-	stockEntity := domain.StockEntity{}
+	stockEntity := StockEntity{}
 
 	repository.On("FindByTicker", stock.Ticker).
-		Return(stockEntity, domain.StockNotFoundError{})
+		Return(stockEntity, StockNotFoundError{})
 	repository.On("Save", mock.Anything).Return(nil)
 
 	service := StockService{
@@ -59,15 +58,15 @@ func TestRegisterStockWithSuccessShouldReturnNilError(t *testing.T) {
 func TestRegisterStockWithErrorShouldReturnError(t *testing.T) {
 	repository := new(StockRepositoryMock)
 
-	stock := domain.Stock{
+	stock := Stock{
 		Ticker: "ABV9",
 		Price:  100,
 	}
 
-	stockEntity := domain.StockEntity{}
+	stockEntity := StockEntity{}
 
 	repository.On("FindByTicker", stock.Ticker).
-		Return(stockEntity, domain.StockNotFoundError{})
+		Return(stockEntity, StockNotFoundError{})
 	expectedError := errors.New("Error creating stock")
 	repository.On("Save", mock.Anything).Return(expectedError)
 
@@ -86,7 +85,7 @@ func TestSearchRegisteredStockByTickerShouldReturnStock(t *testing.T) {
 	repository := new(StockRepositoryMock)
 
 	ticker := "ABV9"
-	stockEntity := domain.StockEntity{
+	stockEntity := StockEntity{
 		ID:     uint(1),
 		Ticker: ticker,
 		Price:  100,
@@ -110,9 +109,9 @@ func TestSearchUneegisteredStockByTickerShouldReturnError(t *testing.T) {
 	repository := new(StockRepositoryMock)
 
 	ticker := "ABV9"
-	stockEntity := domain.StockEntity{}
+	stockEntity := StockEntity{}
 
-	notFoundError := domain.StockNotFoundError{}
+	notFoundError := StockNotFoundError{}
 	repository.On("FindByTicker", ticker).Return(stockEntity, notFoundError)
 
 	service := StockService{
@@ -122,7 +121,7 @@ func TestSearchUneegisteredStockByTickerShouldReturnError(t *testing.T) {
 	_, err := service.SearchByTicker(ticker)
 
 	assert.NotNil(t, err)
-	_, isNotFound := err.(domain.StockNotFoundError)
+	_, isNotFound := err.(StockNotFoundError)
 	assert.True(t, isNotFound)
 	repository.AssertExpectations(t)
 }
@@ -130,7 +129,7 @@ func TestSearchUneegisteredStockByTickerShouldReturnError(t *testing.T) {
 func TestFindAllReturningEmptyShouldReturnEmptyList(t *testing.T) {
 	repository := new(StockRepositoryMock)
 
-	stocks := []domain.StockEntity{}
+	stocks := []StockEntity{}
 	repository.On("FindAll").Return(stocks)
 
 	service := StockService{
@@ -145,7 +144,7 @@ func TestFindAllReturningEmptyShouldReturnEmptyList(t *testing.T) {
 func TestFindAllReturningOneItemShouldReturnListWithOneItem(t *testing.T) {
 	repository := new(StockRepositoryMock)
 
-	stocks := []domain.StockEntity{
+	stocks := []StockEntity{
 		{
 			Ticker: "ABV9",
 		},

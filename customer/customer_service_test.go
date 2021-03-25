@@ -1,9 +1,8 @@
-package service
+package customer
 
 import (
 	"testing"
 
-	"github.com/eaneto/stocker/domain"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -12,14 +11,14 @@ type CustomerRepositoryMock struct {
 	mock.Mock
 }
 
-func (m *CustomerRepositoryMock) Save(stock domain.CustomerEntity) error {
+func (m *CustomerRepositoryMock) Save(stock CustomerEntity) error {
 	args := m.Called(stock)
 	return args.Error(0)
 }
 
-func (m *CustomerRepositoryMock) FindAll() []domain.CustomerEntity {
+func (m *CustomerRepositoryMock) FindAll() []CustomerEntity {
 	args := m.Called()
-	return args.Get(0).([]domain.CustomerEntity)
+	return args.Get(0).([]CustomerEntity)
 }
 
 func TestRegisterCustomerWithSuccessShouldCallRepository(t *testing.T) {
@@ -40,7 +39,7 @@ func TestRegisterCustomerWithSuccessShouldCallRepository(t *testing.T) {
 func TestFindAllCustomersReturningEmptyShouldReturnEmptyList(t *testing.T) {
 	repository := new(CustomerRepositoryMock)
 
-	customers := []domain.CustomerEntity{}
+	customers := []CustomerEntity{}
 	repository.On("FindAll").Return(customers)
 
 	service := CustomerService{
@@ -55,7 +54,7 @@ func TestFindAllCustomersReturningEmptyShouldReturnEmptyList(t *testing.T) {
 func TestFindAllCustomersReturningOneItemShouldReturnListWithOneItem(t *testing.T) {
 	repository := new(CustomerRepositoryMock)
 
-	customers := []domain.CustomerEntity{
+	customers := []CustomerEntity{
 		{
 			Name: "ABV9",
 		},

@@ -1,25 +1,24 @@
-package repository
+package order
 
 import (
 	"sync"
 
-	"github.com/eaneto/stocker/domain"
 	"github.com/google/uuid"
 )
 
 var stockOrderMutex sync.RWMutex = sync.RWMutex{}
 
 // Orders by the order code.
-var ordersByCode map[uuid.UUID]domain.StockOrderEntity = make(map[uuid.UUID]domain.StockOrderEntity)
+var ordersByCode map[uuid.UUID]StockOrderEntity = make(map[uuid.UUID]StockOrderEntity)
 
 // Orders by the customer id.
-var ordersByCustomer map[uint][]domain.StockOrderEntity = make(map[uint][]domain.StockOrderEntity)
+var ordersByCustomer map[uint][]StockOrderEntity = make(map[uint][]StockOrderEntity)
 
 type StockOrderRepository interface {
-	Save(stockOrder domain.StockOrderEntity) error
-	Update(stockOrder domain.StockOrderEntity) error
-	FindByCode(code uuid.UUID) (domain.StockOrderEntity, error)
-	FindAllByCustomer(customerID uint) []domain.StockOrderEntity
+	Save(stockOrder StockOrderEntity) error
+	Update(stockOrder StockOrderEntity) error
+	FindByCode(code uuid.UUID) (StockOrderEntity, error)
+	FindAllByCustomer(customerID uint) []StockOrderEntity
 }
 
 type StockOrderRepositoryInMemory struct{}
@@ -28,7 +27,7 @@ func NewStockOrderRepository() StockOrderRepository {
 	return StockOrderRepositoryInMemory{}
 }
 
-func (StockOrderRepositoryInMemory) Save(stockOrder domain.StockOrderEntity) error {
+func (StockOrderRepositoryInMemory) Save(stockOrder StockOrderEntity) error {
 	stockOrderMutex.Lock()
 	ordersByCode[stockOrder.Code] = stockOrder
 	ordersByCustomer[stockOrder.CustomerID] = append(
@@ -37,7 +36,7 @@ func (StockOrderRepositoryInMemory) Save(stockOrder domain.StockOrderEntity) err
 	return nil
 }
 
-func (StockOrderRepositoryInMemory) Update(stockOrder domain.StockOrderEntity) error {
+func (StockOrderRepositoryInMemory) Update(stockOrder StockOrderEntity) error {
 	stockOrderMutex.Lock()
 	ordersByCode[stockOrder.Code] = stockOrder
 	// Updates the order on the customers list.
@@ -50,14 +49,14 @@ func (StockOrderRepositoryInMemory) Update(stockOrder domain.StockOrderEntity) e
 	return nil
 }
 
-func (StockOrderRepositoryInMemory) FindByCode(code uuid.UUID) (domain.StockOrderEntity, error) {
+func (StockOrderRepositoryInMemory) FindByCode(code uuid.UUID) (StockOrderEntity, error) {
 	order, ok := ordersByCode[code]
 	if ok {
 		return order, nil
 	}
-	return domain.StockOrderEntity{}, domain.StockOrderNotFoundError{Code: code}
+	return StockOrderEntity{}, StockOrderNotFoundError{Code: code}
 }
 
-func (StockOrderRepositoryInMemory) FindAllByCustomer(customerID uint) []domain.StockOrderEntity {
+func (StockOrderRepositoryInMemory) FindAllByCustomer(customerID uint) []StockOrderEntity {
 	return ordersByCustomer[customerID]
 }

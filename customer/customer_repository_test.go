@@ -1,10 +1,9 @@
-package repository
+package customer
 
 import (
 	"testing"
 	"time"
 
-	"github.com/eaneto/stocker/domain"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -13,7 +12,7 @@ func TestSaveCustomerShouldSaveOnMap(t *testing.T) {
 
 	repository := CustomerRepositoryInMemory{}
 
-	customer := domain.CustomerEntity{
+	customer := CustomerEntity{
 		Name:      "Edison",
 		CreatedAt: time.Now(),
 	}
@@ -40,9 +39,9 @@ func TestFindAllCustomersWithNoneRegisteredShouldReturnEmptySlice(t *testing.T) 
 func TestFindAllCustomersWithOneRegisteredShouldReturnSliceWithOneElement(t *testing.T) {
 	clearAllCustomers()
 
-	customers := make(map[uint]domain.CustomerEntity)
+	customers := make(map[uint]CustomerEntity)
 	id := uint(1)
-	customer := domain.CustomerEntity{
+	customer := CustomerEntity{
 		Name: "Françoise",
 		ID:   id,
 	}
@@ -60,5 +59,5 @@ func TestFindAllCustomersWithOneRegisteredShouldReturnSliceWithOneElement(t *tes
 // clearAllCustomers Clears all stores customers and resets ids.
 func clearAllCustomers() {
 	customerId = 0
-	customersByID = make(map[uint]domain.CustomerEntity)
+	customersByID = make(map[uint]CustomerEntity)
 }

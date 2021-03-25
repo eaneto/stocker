@@ -1,22 +1,20 @@
-package handler
+package customer
 
 import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
 
-	"github.com/eaneto/stocker/domain"
-	"github.com/eaneto/stocker/service"
 	"github.com/sirupsen/logrus"
 )
 
 type CustomerHandler struct {
-	CustomerService service.BaseCustomerService
+	CustomerService BaseCustomerService
 }
 
 func NewCustomerHandler() http.Handler {
 	return CustomerHandler{
-		CustomerService: service.NewCustomerService(),
+		CustomerService: NewCustomerService(),
 	}
 }
 
@@ -55,7 +53,7 @@ func (handler CustomerHandler) handlePost(w http.ResponseWriter, r *http.Request
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	customer := domain.Customer{}
+	customer := Customer{}
 	err = json.Unmarshal(body, &customer)
 	if err != nil {
 		logrus.WithFields(logrus.Fields{

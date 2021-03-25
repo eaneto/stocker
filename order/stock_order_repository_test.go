@@ -1,10 +1,9 @@
-package repository
+package order
 
 import (
 	"testing"
 	"time"
 
-	"github.com/eaneto/stocker/domain"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
@@ -14,12 +13,12 @@ func TestSaveStockOrderShouldSaveByCodeAndCustomer(t *testing.T) {
 
 	repository := StockOrderRepositoryInMemory{}
 	code, _ := uuid.NewRandom()
-	stockOrder := domain.StockOrderEntity{
+	stockOrder := StockOrderEntity{
 		Code:       code,
 		CustomerID: uint(1),
 		StockID:    uint(2),
 		Amount:     uint(100),
-		Status:     domain.Created,
+		Status:     Created,
 		CreatedAt:  time.Now(),
 		UpdatedAt:  time.Now(),
 	}
@@ -43,13 +42,13 @@ func TestSaveTwoStockOrderFromSameCustomerShouldSaveByCodeAndCustomer(t *testing
 	code1, _ := uuid.NewRandom()
 	code2, _ := uuid.NewRandom()
 	customerID := uint(1)
-	stockOrders := []domain.StockOrderEntity{
+	stockOrders := []StockOrderEntity{
 		{
 			Code:       code1,
 			CustomerID: customerID,
 			StockID:    uint(2),
 			Amount:     uint(100),
-			Status:     domain.Created,
+			Status:     Created,
 			CreatedAt:  time.Now(),
 			UpdatedAt:  time.Now(),
 		},
@@ -58,7 +57,7 @@ func TestSaveTwoStockOrderFromSameCustomerShouldSaveByCodeAndCustomer(t *testing
 			CustomerID: customerID,
 			StockID:    uint(4),
 			Amount:     uint(50),
-			Status:     domain.Created,
+			Status:     Created,
 			CreatedAt:  time.Now(),
 			UpdatedAt:  time.Now(),
 		},
@@ -84,7 +83,7 @@ func TestSaveTwoStockOrderFromSameCustomerShouldSaveByCodeAndCustomer(t *testing
 	assertStockOrderEqual(t, stockOrders[1], foundOrderByCustomer[1])
 }
 
-func assertStockOrderEqual(t *testing.T, orderA, orderB domain.StockOrderEntity) {
+func assertStockOrderEqual(t *testing.T, orderA, orderB StockOrderEntity) {
 	assert.Equal(t, orderA.Amount, orderB.Amount)
 	assert.Equal(t, orderA.StockID, orderB.StockID)
 	assert.Equal(t, orderA.Status, orderB.Status)
@@ -105,6 +104,6 @@ func TestFindAllStockOrdersByCustomer(t *testing.T) {
 
 // clearAllStockOrders Clears all stored orders and resets id.
 func clearAllStockOrders() {
-	ordersByCode = make(map[uuid.UUID]domain.StockOrderEntity)
-	ordersByCustomer = make(map[uint][]domain.StockOrderEntity)
+	ordersByCode = make(map[uuid.UUID]StockOrderEntity)
+	ordersByCustomer = make(map[uint][]StockOrderEntity)
 }

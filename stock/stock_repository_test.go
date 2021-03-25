@@ -1,9 +1,8 @@
-package repository
+package stock
 
 import (
 	"testing"
 
-	"github.com/eaneto/stocker/domain"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -12,7 +11,7 @@ func TestSaveStockShouldSaveStockOnMap(t *testing.T) {
 
 	repository := StockRepositoryInMemory{}
 
-	stock := domain.StockEntity{
+	stock := StockEntity{
 		Ticker: "ABC",
 	}
 
@@ -28,8 +27,8 @@ func TestSaveStockShouldSaveStockOnMap(t *testing.T) {
 func TestFindStockByTicker(t *testing.T) {
 	clearAllStocks()
 
-	stocks := make(map[string]domain.StockEntity)
-	stock := domain.StockEntity{
+	stocks := make(map[string]StockEntity)
+	stock := StockEntity{
 		ID:     1,
 		Ticker: "ABC",
 	}
@@ -48,7 +47,7 @@ func TestFindStockByTicker(t *testing.T) {
 func TestFindStockByTickerNonExistentStock(t *testing.T) {
 	clearAllStocks()
 
-	stock := domain.StockEntity{
+	stock := StockEntity{
 		ID:     1,
 		Ticker: "ABC",
 	}
@@ -57,15 +56,15 @@ func TestFindStockByTickerNonExistentStock(t *testing.T) {
 	_, err := repository.FindByTicker(stock.Ticker)
 
 	assert.NotNil(t, err)
-	_, notFound := err.(domain.StockNotFoundError)
+	_, notFound := err.(StockNotFoundError)
 	assert.True(t, notFound)
 }
 
 func TestFindStockByID(t *testing.T) {
 	clearAllStocks()
 
-	stocks := make(map[string]domain.StockEntity)
-	stock := domain.StockEntity{
+	stocks := make(map[string]StockEntity)
+	stock := StockEntity{
 		ID:     1,
 		Ticker: "ABC",
 	}
@@ -84,7 +83,7 @@ func TestFindStockByID(t *testing.T) {
 func TestFindStockByIDNonExistentStockShouldReturnError(t *testing.T) {
 	clearAllStocks()
 
-	stock := domain.StockEntity{
+	stock := StockEntity{
 		ID:     1,
 		Ticker: "ABC",
 	}
@@ -93,7 +92,7 @@ func TestFindStockByIDNonExistentStockShouldReturnError(t *testing.T) {
 	_, err := repository.FindByTicker(stock.Ticker)
 
 	assert.NotNil(t, err)
-	_, notFound := err.(domain.StockNotFoundError)
+	_, notFound := err.(StockNotFoundError)
 	assert.True(t, notFound)
 }
 
@@ -110,8 +109,8 @@ func TestFindAllStocksWithNoneRegisteredShouldReturnEmptySlice(t *testing.T) {
 func TestFindAllStocksWithOneRegisteredShouldReturnSliceWithOneElement(t *testing.T) {
 	clearAllStocks()
 
-	stocks := make(map[string]domain.StockEntity)
-	stock := domain.StockEntity{
+	stocks := make(map[string]StockEntity)
+	stock := StockEntity{
 		ID:     1,
 		Ticker: "ABC",
 	}
@@ -129,5 +128,5 @@ func TestFindAllStocksWithOneRegisteredShouldReturnSliceWithOneElement(t *testin
 // clearAllStocks Clears all stored stocks and resets id.
 func clearAllStocks() {
 	stockId = 0
-	stocksByTicker = make(map[string]domain.StockEntity)
+	stocksByTicker = make(map[string]StockEntity)
 }

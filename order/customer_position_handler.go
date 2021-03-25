@@ -1,4 +1,4 @@
-package handler
+package order
 
 import (
 	"encoding/json"
@@ -6,17 +6,16 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/eaneto/stocker/service"
 	"github.com/sirupsen/logrus"
 )
 
 type CustomerPositionHandler struct {
-	StockOrderService service.BaseStockOrderService
+	StockOrderService BaseStockOrderService
 }
 
 func NewCustomerPositionHandler() CustomerPositionHandler {
 	return CustomerPositionHandler{
-		StockOrderService: service.NewStockOrderService(),
+		StockOrderService: NewStockOrderService(),
 	}
 }
 
