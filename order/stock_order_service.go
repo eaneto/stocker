@@ -22,6 +22,7 @@ type BaseStockOrderService interface {
 type StockOrderService struct {
 	StockOrderRepository StockOrderRepository
 	StockService         stock.BaseStockService
+	StockOrderPool       StockOrderPool
 }
 
 func NewStockOrderService() BaseStockOrderService {
@@ -54,18 +55,16 @@ func (service StockOrderService) CreateOrder(stockOrderRequest StockOrderRequest
 	}
 	service.StockOrderRepository.Save(stockOrder)
 	// Publish the request to the stock order channel
-	orderRequestsChannel <- stockOrderRequest
+	service.StockOrderPool.Publish(stockOrderRequest)
 	return nil
 }
 
 func (service StockOrderService) ConfirmOrders() {
 	for {
-		select {
-		case orderRequest := <-orderRequestsChannel:
-			// Expensive computation
-			time.Sleep(time.Second * 2)
-			service.confirmOrder(orderRequest)
-		}
+		orderRequest := service.StockOrderPool.Poll()
+		// Expensive computation
+		time.Sleep(time.Second * 2)
+		service.confirmOrder(*orderRequest)
 	}
 }
 
@@ -77,6 +76,15 @@ func (service StockOrderService) confirmOrder(stockOrderRequest StockOrderReques
 			"error":      err,
 		}).Error("Reading order, this should never happen!!")
 	} else {
+		// If the order isn't created, than it shouldn't be confirmed.
+		if order.Status != Created {
+			logrus.WithFields(logrus.Fields{
+				"order_code": order.Code,
+				"status":     order.Status,
+			}).Error("Order status different from Created")
+			return
+		}
+
 		order.Status = Confirmed
 		order.UpdatedAt = time.Now()
 		service.StockOrderRepository.Update(order)
